@@ -915,7 +915,7 @@
                     <div class="detail-title-sub">زەلامێ جەنگێ</div>
 
                     <div class="detail-story">
-                        پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا, کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.
+                        پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.
                     </div>
 
                     <div class="detail-stats">
@@ -941,8 +941,8 @@
                     <!-- کانتینەرێ نوو و شیک یێ پلەیەرێ تایبەت ب ڕەنگێ زەر -->
                     <div class="video-wrapper">
                         <div class="video-player-container" id="video-container">
-                            <!-- ل شوونا تاگا سادە، مە بەستەر دایە تاگا سەرەکی یا ڤیدیۆیێ بۆ لێدانا دروست ل سەر مۆبایلان -->
-                            <video id="main-player" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp" playsinline crossorigin="anonymous">
+                            <!-- لێرە پەیڤا crossorigin هاتیە لادان داکو ڤیدیۆ ب تەواوی ب بێ کێشە ل سەر مۆبایل و سایتێ گیتھەبی کار کەت -->
+                            <video id="main-player" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp" playsinline>
                                 یاریپێکەر پێشگیری ناکەت.
                             </video>
                             
@@ -959,11 +959,16 @@
                                 
                                 <div class="controls-bottom">
                                     <div class="controls-left">
+                                        <!-- دوگمێن ١٠ چرکە بۆ پاشڤە برن، لێدان، و پێشڤە برنا فیلمی -->
+                                        <button class="control-btn" id="rewind-btn" title="10 چرکە بۆ پاشڤە"><i class="fas fa-undo"></i></button>
                                         <button class="control-btn" id="play-pause-btn"><i class="fas fa-play"></i></button>
+                                        <button class="control-btn" id="forward-btn" title="10 چرکە بۆ پێشڤە"><i class="fas fa-redo"></i></button>
                                         <span class="time-display" id="time-display">00:00 / 00:00</span>
                                     </div>
                                     <div class="controls-right">
-                                        <button class="control-btn" id="fullscreen-btn"><i class="fas fa-expand"></i></button>
+                                        <!-- دوگما ئۆتۆماتیک یا لاندسکەیپ و فۆڵ شاشە -->
+                                        <button class="control-btn" id="rotate-btn" title="Landscape (ئاسۆیی ئۆتۆماتیک)"><i class="fas fa-sync-alt"></i></button>
+                                        <button class="control-btn" id="fullscreen-btn" title="فۆڵ شاشە"><i class="fas fa-expand"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -1070,6 +1075,9 @@
         const timeDisplay = document.getElementById('time-display');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         const videoContainer = document.getElementById('video-container');
+        const rewindBtn = document.getElementById('rewind-btn');
+        const forwardBtn = document.getElementById('forward-btn');
+        const rotateBtn = document.getElementById('rotate-btn');
 
         // گۆهۆڕینا دۆخێ لێدانێ (Play/Pause)
         function togglePlay() {
@@ -1087,6 +1095,44 @@
         playPauseBtn.addEventListener('click', togglePlay);
         centerPlayBtn.addEventListener('click', togglePlay);
         video.addEventListener('click', togglePlay);
+
+        // ١٠ چرکە بۆ دواوە (Rewind 10s)
+        rewindBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            video.currentTime = Math.max(0, video.currentTime - 10);
+        });
+
+        // ١٠ چرکە بۆ پێشڤە (Forward 10s)
+        forwardBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            video.currentTime = Math.min(video.duration, video.currentTime + 10);
+        });
+
+        // دوگما ئۆتۆماتیک یا لاندسکەیپ (Rotate to Landscape)
+        async function makeLandscape(e) {
+            e.stopPropagation();
+            try {
+                // ل دەستپێکێ دۆخێ فۆڵ شاشە چالاک دکەین
+                if (!document.fullscreenElement) {
+                    if (videoContainer.requestFullscreen) {
+                        await videoContainer.requestFullscreen();
+                    } else if (videoContainer.webkitRequestFullscreen) {
+                        await videoContainer.webkitRequestFullscreen();
+                    }
+                }
+                
+                // پاشان شاشێ دکەینە ئاسۆیی (Landscape)
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                } else if (screen.lockOrientation) {
+                    screen.lockOrientation('landscape');
+                }
+            } catch (error) {
+                console.log("Landscape mode needs user active interaction inside fullscreen first:", error);
+            }
+        }
+
+        rotateBtn.addEventListener('click', makeLandscape);
 
         // ڕێکخستنا کات و شریتا پێشڤەچوونێ
         function formatTime(seconds) {
@@ -1144,6 +1190,18 @@
         }
 
         fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // زڤڕاندنا شاشێ بۆ دۆخێ ستۆنی دەمێ ژ فۆڵ شاشێ دەردکەڤیت
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock();
+                }
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            } else {
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            }
+        });
 
         // دیاربوونا کۆنتڕۆڵان ل سەر مۆبایلێ دەمێ دەست لێدانێ
         let touchTimeout;
