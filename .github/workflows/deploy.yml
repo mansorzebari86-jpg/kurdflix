@@ -1,1 +1,30 @@
+name: Auto Translate Subtitles
 
+on:
+  push:
+    paths:
+      - 'subtitles.vtt' # کاتێک فایلا ئینگلیزی نوو دەبیت دکەڤیتە کار
+  workflow_dispatch: # ڕێپێدان ب کارپێکرنا دەستی ژ پەیجێ Actions
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run translation script
+        run: node translate.js
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add subtitles_ckb.vtt subtitles_ku.vtt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-translated subtitles to Kurdish [Sorani & Badini]" && git push)
