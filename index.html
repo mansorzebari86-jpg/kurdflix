@@ -1,1 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurdflix - سینەمایا کوردی</title>
+    <!-- لودکرنا فونت و ئایکۆنان -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* -------------------------------------
+           شێواز و ستایلێن گشتی یێن سایت
+        ---------------------------------------- */
+        :root {
+            --primary-red: #e50914; 
+            --primary-yellow: #f5b50a; 
+            --bg-dark: #0a0a0c;
+            --bg-card: #141418;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        /* -------------------------------------
+           هێدەر (Header)
+        ---------------------------------------- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            background-color: rgba(10, 10, 12, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            flex-direction: row-reverse; 
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary-red);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* -------------------------------------
+           بینینی سەرەکی (Home View - Red Theme)
+        ---------------------------------------- */
+        #home-view {
+            display: block; 
+        }
+
+        .welcome-hero {
+            position: relative;
+            height: 45vh;
+            min-height: 300px;
+            background: linear-gradient(to bottom, rgba(10,10,12,0.2) 0%, var(--bg-dark) 100%), 
+                        url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=1470&auto=format&fit=crop') center top/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .welcome-content {
+            background: rgba(10, 10, 12, 0.7);
+            padding: 25px 35px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+        }
+
+        .welcome-badge {
+            display: inline-block;
+            background-color: rgba(229, 9, 20, 0.2);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .welcome-title {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .welcome-desc {
+            font-size: 14px;
+            color: #d4d4d8;
+            line-height: 1.5;
+        }
+
+        /* کاتیگۆریێن فیلمان */
+        .categories-container {
+            padding: 20px 4% 30px 4%;
+        }
+
+        .category-section {
+            margin-bottom: 35px;
+            text-align: right;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-right: 10px;
+            border-right: 4px solid var(--primary-red);
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .movies-slider {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scrollbar-width: none;
+        }
+
+        .movies-slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* کارتێن فیلمان */
+        .movie-card {
+            min-width: 140px;
+            width: 140px;
+            background-color: var(--bg-card);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-red);
+            box-shadow: 0 8px 16px rgba(229, 9, 20, 0.2);
+        }
+
+        .movie-thumbnail {
+            position: relative;
+            height: 190px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .badge-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: var(--primary-red);
+            color: white;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .movie-details {
+            padding: 10px;
+            text-align: right;
+        }
+
+        .movie-name {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* -------------------------------------
+           بینینی فیلمێ تایبەت (Movie Detail View - Yellow Theme)
+        ---------------------------------------- */
+        #movie-detail-view {
+            display: none; 
+        }
+
+        .detail-hero {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            min-height: 300px;
+            background: linear-gradient(to top, var(--bg-dark) 0%, rgba(10,10,12,0.4) 100%), 
+                        url('https://i.ibb.co/xqykFmrN/man-of-war60.webp') center 20%/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+        .back-nav {
+            position: absolute;
+            top: 15px;
+            right: 5%;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+        }
+
+        .back-nav:hover {
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+        }
+
+        .detail-poster-container {
+            width: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            border: 2px solid rgba(255,255,255,0.1);
+            margin-bottom: 15px;
+        }
+
+        .detail-poster-img {
+            width: 100%;
+            display: block;
+        }
+
+        .detail-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 35px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-play {
+            background-color: var(--primary-yellow);
+            color: #000;
+        }
+
+        .btn-play:hover {
+            background-color: #dca309;
+            transform: scale(1.05);
+        }
+
+        /* بۆکسێ چیرۆک و زانیاریان */
+        .detail-info-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 5%;
+        }
+
+        .detail-info-box {
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: -15px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-tags {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .detail-tag {
+            background-color: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .detail-title-main {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .detail-title-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .detail-story {
+            font-size: 13px;
+            color: #c0c5d0;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            text-align: right;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+        }
+
+        .detail-stats {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .detail-stat-box {
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .detail-stat-num {
+            font-size: 15px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* -------------------------------------
+           پلەیەرێ فەرمیێ ناڤخۆیی یێ کوردفلیکس (Kurdflix Native Player)
+        ---------------------------------------- */
+        .player-container-box {
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .player-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .player-title {
+            color: var(--primary-yellow);
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            background-color: #000;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* پلەیەرێ ناڤخۆیی یێ فەرمی */
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background-color: #000;
+        }
+
+        /* ستایلێ نمایشکرنا ژێرنویسێ ل سەر ڤیدیۆیێ */
+        video::cue {
+            background-color: rgba(10, 10, 12, 0.85);
+            color: var(--primary-yellow);
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        /* ستایلێن چاڤەڕێبوونا AI */
+        .ai-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 10, 12, 0.96);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .ai-loader-content {
+            text-align: center;
+            padding: 20px;
+            max-width: 400px;
+        }
+
+        .ai-icon {
+            font-size: 50px;
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(245, 181, 10, 0.5);
+        }
+
+        .ai-status-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .ai-status-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-yellow);
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+
+        /* بەشێ کۆنتڕۆلێن دەنگ و زیرەکیێ */
+        .player-controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+            flex-direction: row-reverse;
+        }
+
+        .ai-translate-btn {
+            background-color: var(--primary-yellow);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .ai-translate-btn:hover {
+            background-color: #ffe066;
+            box-shadow: 0 0 15px rgba(245, 181, 10, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .ai-status-indicator {
+            font-size: 13px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-direction: row-reverse;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #ef4444; 
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.active {
+            background-color: #10b981; 
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* بەشێ ئەکتەران */
+        .cast-section {
+            margin-top: 25px;
+            text-align: right;
+        }
+
+        .cast-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-right: 4px solid var(--primary-yellow);
+            padding-right: 8px;
+        }
+
+        .cast-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 5px;
+        }
+
+        .cast-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cast-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .cast-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            margin-bottom: 6px;
+        }
+
+        .cast-name {
+            font-size: 11px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* -------------------------------------
+           بەشێ سێرڤەران
+        ---------------------------------------- */
+        .servers-section {
+            margin-top: 30px;
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .servers-title {
+            color: var(--primary-yellow);
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .servers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .server-btn {
+            background-color: rgba(255,255,255,0.03);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            text-align: right;
+        }
+
+        .server-btn:hover {
+            background-color: rgba(245, 181, 10, 0.1);
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+        }
+
+        .active-server {
+            background-color: rgba(245, 181, 10, 0.15);
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
+            font-weight: bold;
+        }
+
+        /* -------------------------------------
+           مینیویا لایێ ڕاستێ (Sidebar)
+        ---------------------------------------- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background-color: var(--bg-card);
+            z-index: 1000;
+            transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.8);
+            border-left: 1px solid var(--border-color);
+            padding: 30px 20px;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-title {
+            font-weight: 900; 
+            color: var(--primary-red); 
+            font-size: 22px;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(229, 9, 20, 0.1);
+            color: var(--text-main);
+        }
+
+        .backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+        }
+
+        .backdrop.active {
+            display: block;
+        }
+
+        /* -------------------------------------
+           ناڤێ پێشخەری (Developer Footer)
+        ---------------------------------------- */
+        .footer-credit {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-dark);
+        }
+
+        .footer-credit span {
+            color: var(--primary-red);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- بەکدرۆپ بۆ مینیوێ -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- مینیویا لایێ ڕاستێ -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">KURDFLIX</span>
+            <button class="close-btn" id="close-sidebar-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="showHomeView(); return false;"><i class="fas fa-home"></i> لاپەرێ سەرەکی</a></li>
+            <li><a href="#"><i class="fas fa-film"></i> فیلمێن دۆبلاژکری</a></li>
+            <li><a href="#"><i class="fas fa-closed-captioning"></i> فیلمێن ژێرنویس</a></li>
+        </ul>
+    </div>
+
+    <!-- سەرپەڕێ سایت (Header) -->
+    <header>
+        <a href="#" onclick="showHomeView(); return false;" class="logo" id="header-logo">
+            Kurdflix <i class="fas fa-play" style="font-size: 20px;"></i>
+        </a>
+        <button class="menu-btn" id="open-sidebar-btn">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+    </header>
+
+    <div class="main-content">
+        <!-- ====================================================
+             بینینی ئێکێ: لاپەرێ سەرەکی (سوور)
+        ========================================================= -->
+        <div id="home-view">
+            <div class="welcome-hero">
+                <div class="welcome-content">
+                    <span class="welcome-badge">پێشەنگێ فیلمێن کوردی</span>
+                    <h1 class="welcome-title">بخێرهاتی بۆ <span style="color: var(--primary-red);">Kurdflix</span></h1>
+                    <p class="welcome-desc">خۆشترین فیلمێن دۆبلاژ و ژێرنویس ل ڤێرە ب زارۆڤێ بادینی و سۆرانی بەردەستن.</p>
+                </div>
+            </div>
+
+            <div class="categories-container">
+                <!-- کاتیگۆریا ئەکشن -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <span class="category-title"><i class="fas fa-bolt" style="color: #fbbf24;"></i> فیلمێن ئەکشن (Action)</span>
+                    </div>
+                    <div class="movies-slider">
+                        <div class="movie-card" onclick="showMovieDetail('man-of-war')">
+                            <span class="badge-tag">HD</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/xqykFmrN/man-of-war60.webp');"></div>
+                            <div class="movie-details">
+                                <div class="movie-name">Man of War</div>
+                            </div>
+                        </div>
+
+                        <div class="movie-card">
+                            <span class="badge-tag">FHD</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=300&auto=format&fit=crop');"></div>
+                            <div class="movie-details">
+                                <div class="movie-name">جەنگاوەرێ دوماهییێ</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- کاتیگۆریا ترسناک -->
+                <div class="category-section">
+                    <div class="category-header">
+                        <span class="category-title"><i class="fas fa-ghost" style="color: #a78bfa;"></i> فیلمێن ترسناک (Horror)</span>
+                    </div>
+                    <div class="movies-slider">
+                        <div class="movie-card">
+                            <span class="badge-tag">HD</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop');"></div>
+                            <div class="movie-details">
+                                <div class="movie-name">شەڤا د کانیێ دا</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================
+             بینینی دووێ: لاپەرێ زانیاریێن فیلمی (زەر - شافیلم)
+        ========================================================= -->
+        <div id="movie-detail-view">
+            <div class="detail-hero">
+                <button class="back-nav" onclick="showHomeView()"><i class="fas fa-arrow-right"></i> زڤڕین</button>
+                <div class="detail-poster-container">
+                    <img src="https://i.ibb.co/xqykFmrN/man-of-war60.webp" alt="Man of War" class="detail-poster-img">
+                </div>
+                <div class="detail-buttons">
+                    <a href="#player-area" class="btn btn-play"><i class="fas fa-play"></i> تەماشاکرن</a>
+                </div>
+            </div>
+
+            <div class="detail-info-container">
+                <div class="detail-info-box">
+                    <div class="detail-tags">
+                        <span class="detail-tag">١ دەمژمێر و ٥١ خۆلەک</span>
+                        <span class="detail-tag">٢٠٢١</span>
+                        <span class="detail-tag">ئەکشن</span>
+                        <span class="detail-tag" style="background-color: rgba(245, 181, 10, 0.2); color: var(--primary-yellow);">Kurdish</span>
+                    </div>
+
+                    <h1 class="detail-title-main">Man of War</h1>
+                    <div class="detail-title-sub">زەلامێ جەنگێ</div>
+
+                    <div class="detail-story">
+                        پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.
+                    </div>
+
+                    <div class="detail-stats">
+                        <div class="detail-stat-box">
+                            <span class="detail-stat-num">٣٥,١٧٧</span>
+                            <span style="font-size: 11px; color: var(--text-muted);">بینین</span>
+                        </div>
+                        <div class="detail-stat-box">
+                            <span class="detail-stat-num" style="color: var(--primary-yellow);">⭐ ٦.٣/١٠</span>
+                            <span style="font-size: 11px; color: var(--text-muted);">IMDb</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ----------------------------------------------------
+                     پلەیەرێ کوردفلیکس (Native HTML5 Video Player)
+                --------------------------------------------------------- -->
+                <div class="player-container-box" id="player-area">
+                    <div class="player-title-bar">
+                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس (Kurdflix Player)</span>
+                    </div>
+                    
+                    <!-- پلەیەرێ گشتی یێ ناڤخۆیی یێ تەمامکری بۆ لێدانا مپ٤ -->
+                    <div class="video-wrapper">
+                        <!-- تێبینی: نوکە بەستەرێ تاقیکاری یێ فەرمی یێ خێرا جێگیر هاتیەکرن داکو کاربکەت -->
+                        <video id="main-player" controls poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp">
+                            <!-- بەستەرێ تاقیکاری یێ مپ٤ یێ خێرا کو ١٠٠٪ کار دکەت -->
+                            <source id="player-source" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                            <!-- ترەکا ژێرنویسا بادینی یا AI -->
+                            <track id="player-track" label="بادینی (AI)" kind="subtitles" srclang="ku" default>
+                            یاریپێکەر پێشگیری ناکەت.
+                        </video>
+                        
+                        <!-- شاشا بارکرنا وەرگێڕانا هوشمەند AI -->
+                        <div class="ai-loading-overlay" id="ai-loading">
+                            <div class="ai-loader-content">
+                                <i class="fas fa-robot fa-spin ai-icon"></i>
+                                <div class="ai-status-text" id="ai-status-desc">سیستەمێ AI یێ کوردفلیکس کار دکەت...</div>
+                                <div class="ai-status-sub">سکرین و ژێرنویسێن بادینی دهێنە رێکخستن</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="ai-progress-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- پانێلا کۆنتڕۆلا زیرەکیا دەستکرد AI -->
+                    <div class="player-controls-bar">
+                        <button class="ai-translate-btn" id="ai-toggle-btn" onclick="toggleAITranslation()">
+                            <i class="fas fa-robot"></i> چالاککرنا ژێرنویسا AI (بادینی)
+                        </button>
+                        <div class="ai-status-indicator">
+                            <span>دۆخی ژێرنویسێ: </span>
+                            <strong id="ai-current-status" style="color: #ef4444;">نەچالاکە</strong>
+                            <span class="status-dot" id="ai-status-dot"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ئەکتەران -->
+                <div class="cast-section">
+                    <div class="cast-title">ئەکتەر و دەرهێنەر</div>
+                    <div class="cast-scroll">
+                        <div class="cast-item">
+                            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" class="cast-img">
+                            <span class="cast-name">William K.</span>
+                            <span class="cast-role">دەرهێنەر</span>
+                        </div>
+                        <div class="cast-item">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" class="cast-img">
+                            <span class="cast-name">LaMonica G.</span>
+                            <span class="cast-role">ئەکتەر</span>
+                        </div>
+                        <div class="cast-item">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" class="cast-img">
+                            <span class="cast-name">Andrew H.</span>
+                            <span class="cast-role">ئەکتەر</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بەشێ سێرڤەران -->
+                <div class="servers-section" id="servers-area">
+                    <div class="servers-title"><i class="fas fa-server"></i> هەلبژارتنا سێرڤەری</div>
+                    <div class="servers-list">
+                        <!-- ئەگەر تە ڤیا بەستەرێ فیلمێ خۆ یێ دروست دانی، ل شوونا ڤی بەستەرێ خوارێ دانی -->
+                        <button class="server-btn active-server" onclick="switchServer('main')"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (Kurdflix Player HD)</button>
+                        <button class="server-btn"><i class="fas fa-download"></i> داونلۆدکرن (Download)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- پێشخەرێ سایت (Mansour) -->
+    <div class="footer-credit">
+        Developed by <span>Mansour</span>
+    </div>
+
+    <!-- -------------------------------------
+       سکریپت بۆ کۆنتڕۆلکرنا سایت و گوهۆڕینی
+    ---------------------------------------- */ -->
+    <script>
+        const openBtn = document.getElementById('open-sidebar-btn');
+        const closeBtn = document.getElementById('close-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const homeView = document.getElementById('home-view');
+        const movieDetailView = document.getElementById('movie-detail-view');
+        const headerLogo = document.getElementById('header-logo');
+
+        // ڤەکرنا مینیوێ
+        openBtn.addEventListener('click', () => {
+            sidebar.classList.add('active');
+            backdrop.classList.add('active');
+        });
+
+        // گرتنا مینیوێ
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        });
+
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        });
+
+        // گوهۆڕینی لاپەرەی بۆ لاپەرێ فیلمی (Man of War)
+        function showMovieDetail(movieId) {
+            if (movieId === 'man-of-war') {
+                homeView.style.display = 'none';
+                movieDetailView.style.display = 'block';
+                headerLogo.style.color = 'var(--primary-yellow)';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // گوهۆڕینی لاپەرەی بۆ لاپەرێ سەرەکی (سوور)
+        function showHomeView() {
+            movieDetailView.style.display = 'none';
+            homeView.style.display = 'block';
+            headerLogo.style.color = 'var(--primary-red)';
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ----------------------------------------------------
+        // سیستەمێ کارکرنا AI وەرگێڕانێ ب بادینی (ژێرنویس)
+        // ----------------------------------------------------
+        let aiActive = false;
+
+        // تێکستێ ژێرنویسا بادینی یا تاقیکاری کو دگەل دەستپێکرنا فیلمی داینامیکی لۆد دبیت
+        const vttText = `WEBVTT
+
+1
+00:00:01.000 --> 00:00:05.000
+[دەستپێک] کوردفلیکس - بخێرهاتی بۆ فیلمێ زەلامێ جەنگێ ب زاراڤێ بادینی
+
+2
+00:00:06.000 --> 00:00:11.000
+[AI Translation] پشتی دەست ژ کار کێشانێ، ئەز ژ بۆ جەنگێ بەرهەڤم.
+
+3
+00:00:12.000 --> 00:00:18.000
+دڤێت ل ڤێرێ ڕووبڕووی چەکدارێن ب کرێگرتی ببینەوە.`;
+
+        // لۆدکرنا فایلا VTT ب رێکا Blob د پلەیەرێ ناڤخۆیی دا
+        const blob = new Blob([vttText], { type: 'text/vtt' });
+        const subtitleUrl = URL.createObjectURL(blob);
+        document.getElementById('player-track').src = subtitleUrl;
+
+        function toggleAITranslation() {
+            const aiLoading = document.getElementById('ai-loading');
+            const progressFill = document.getElementById('ai-progress-bar');
+            const aiStatusText = document.getElementById('ai-current-status');
+            const aiStatusDot = document.getElementById('ai-status-dot');
+            const aiToggleBtn = document.getElementById('ai-toggle-btn');
+            const aiDesc = document.getElementById('ai-status-desc');
+            const videoPlayer = document.getElementById('main-player');
+
+            if (!aiActive) {
+                aiLoading.style.display = 'flex';
+                progressFill.style.width = '0%';
+                
+                let progress = 0;
+                const statusSteps = [
+                    "شیکارکرنا فریکوێنسیێن دەنگی...",
+                    "لۆدکرنا ژێرنویسا بادینی یا AI...",
+                    "هەڤدەمی کرنا ژێرنویسێ ل سەر ڤیدیۆیێ...",
+                    "پرۆسێسا وەرگێڕانێ ب سەرکەفتیانە ئەنجامدرا!"
+                ];
+
+                const interval = setInterval(() => {
+                    progress += 2;
+                    progressFill.style.width = progress + '%';
+
+                    if (progress < 30) {
+                        aiDesc.innerText = statusSteps[0];
+                    } else if (progress < 60) {
+                        aiDesc.innerText = statusSteps[1];
+                    } else if (progress < 90) {
+                        aiDesc.innerText = statusSteps[2];
+                    } else {
+                        aiDesc.innerText = statusSteps[3];
+                    }
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            aiLoading.style.display = 'none';
+                            aiActive = true;
+                            
+                            // چالاککرنا نیشاندانا ژێرنویسێ د ناڤ پلەیەرێ ناڤخۆیی دا
+                            videoPlayer.textTracks[0].mode = 'showing';
+                            
+                            aiStatusText.innerText = "چالاکە (ژێرنویسا بادینی ب AI)";
+                            aiStatusText.style.color = "#10b981";
+                            aiStatusDot.classList.add('active');
+                            aiToggleBtn.innerHTML = `<i class="fas fa-times-circle"></i> ڕاگرتنا ژێرنویسا AI`;
+                            aiToggleBtn.style.backgroundColor = "#ef4444";
+                            aiToggleBtn.style.color = "#fff";
+                        }, 500);
+                    }
+                }, 60); 
+            } else {
+                aiActive = false;
+                
+                // ڤەشارتن و داخستنا ژێرنویسێ
+                videoPlayer.textTracks[0].mode = 'disabled';
+                
+                aiStatusText.innerText = "نەچالاکە";
+                aiStatusText.style.color = "#ef4444";
+                aiStatusDot.classList.remove('active');
+                aiToggleBtn.innerHTML = `<i class="fas fa-robot"></i> چالاککرنا ژێرنویسا AI (بادینی)`;
+                aiToggleBtn.style.backgroundColor = "var(--primary-yellow)";
+                aiToggleBtn.style.color = "#000";
+            }
+        }
+
+        function switchServer(serverType) {
+            const player = document.getElementById('main-player');
+            const btns = document.querySelectorAll('.server-btn');
+            
+            btns.forEach(btn => btn.classList.remove('active-server'));
+            
+            if (serverType === 'main') {
+                // لێرە بەستەرێ فەرمیێ یێ MP4 یێ تاقیکاری لۆد دبیت
+                player.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+                event.currentTarget.classList.add('active-server');
+            }
+        }
+    </script>
+</body>
+  </html>
