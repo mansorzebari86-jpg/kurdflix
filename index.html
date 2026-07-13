@@ -395,7 +395,7 @@
         }
 
         /* -------------------------------------
-           پلەیەرێ فەرمیێ کوردفلیکس (Kurdflix Native Player)
+           پلەیەرێ فەرمیێ کوردفلیکس (Kurdflix Custom Video Player)
         ---------------------------------------- */
         .player-container-box {
             background-color: var(--bg-card);
@@ -433,15 +433,159 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* پلەیەرێ ناڤخۆیی یێ گشتی */
-        .video-wrapper video {
+        /* کانتینەرێ سەرەکیێ پلەیەرێ تایبەت */
+        .video-player-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: 0;
             background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-player-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        /* دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) */
+        .center-play-btn {
+            position: absolute;
+            width: 65px;
+            height: 65px;
+            background-color: rgba(245, 181, 10, 0.9);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            font-size: 26px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(245, 181, 10, 0.5);
+            z-index: 10;
+        }
+
+        .center-play-btn:hover {
+            transform: scale(1.1);
+            background-color: #ffe066;
+        }
+
+        .center-play-btn.fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.3);
+        }
+
+        /* شریتا کۆنتڕۆڵێ یا خوارێ یێن تایبەت */
+        .custom-video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 9;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-player-container:hover .custom-video-controls,
+        .video-player-container.touch-active .custom-video-controls {
+            opacity: 1;
+        }
+
+        /* شریتا گەڕانێ یا Sleek Seeker */
+        .progress-container {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-container input[type="range"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 5;
+            margin: 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-yellow);
+            border-radius: 3px;
+            width: 0%;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-yellow);
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* ڕیزا خوارێ یا دوگمەیان */
+        .controls-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: row-reverse;
+        }
+
+        .controls-left, .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-direction: row-reverse;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 17px;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .control-btn:hover {
+            color: var(--primary-yellow);
+        }
+
+        .time-display {
+            font-size: 13px;
+            color: #d4d4d8;
+            font-weight: bold;
+            user-select: none;
         }
 
         /* بەشێ ئەکتەران */
@@ -771,7 +915,7 @@
                     <div class="detail-title-sub">زەلامێ جەنگێ</div>
 
                     <div class="detail-story">
-                        پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.
+                        پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا, کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.
                     </div>
 
                     <div class="detail-stats">
@@ -787,21 +931,43 @@
                 </div>
 
                 <!-- ----------------------------------------------------
-                     پلەیەرێ کوردفلیکس (Native Player - ب تەمامی ناڤخۆیی)
+                     پلەیەرێ فەرمیێ کوردفلیکس (Kurdflix Custom Video Player)
                 --------------------------------------------------------- -->
                 <div class="player-container-box" id="player-area">
                     <div class="player-title-bar">
-                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس (Kurdflix Native Player)</span>
+                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس (Kurdflix Custom Player)</span>
                     </div>
                     
-                    <!-- چوارچۆڤێ ڤیدیۆیێ ناڤخۆیی - پشتگیری ل بەستەرێن MP4 یێن مستقیم دکەت -->
+                    <!-- کانتینەرێ نوو و شیک یێ پلەیەرێ تایبەت ب ڕەنگێ زەر -->
                     <div class="video-wrapper">
-                        <!-- بەستەرێ تە یێ مستقیم یێ فەرمی ل سەر سێرڤەرێ GitHub Releases ل ڤێرە هاتیە جێگیرکرن -->
-                        <video id="main-player" controls poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp">
-                            <!-- بەستەرێ تە یێ دروست و ڕاستەوخۆ ل سەر ڕیلیزا فەرمی یا گیتھەبی -->
-                            <source id="player-source" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" type="video/mp4">
-                            یاریپێکەر پێشگیری ناکەت.
-                        </video>
+                        <div class="video-player-container" id="video-container">
+                            <!-- ل شوونا تاگا سادە، مە بەستەر دایە تاگا سەرەکی یا ڤیدیۆیێ بۆ لێدانا دروست ل سەر مۆبایلان -->
+                            <video id="main-player" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp" playsinline crossorigin="anonymous">
+                                یاریپێکەر پێشگیری ناکەت.
+                            </video>
+                            
+                            <!-- دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) -->
+                            <button class="center-play-btn" id="center-play-btn"><i class="fas fa-play"></i></button>
+                            
+                            <!-- کۆنتڕۆل بارا ل ژێر نیشانێ -->
+                            <div class="custom-video-controls" id="video-controls">
+                                <!-- شریتا پێشڤەچوونێ -->
+                                <div class="progress-container">
+                                    <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                
+                                <div class="controls-bottom">
+                                    <div class="controls-left">
+                                        <button class="control-btn" id="play-pause-btn"><i class="fas fa-play"></i></button>
+                                        <span class="time-display" id="time-display">00:00 / 00:00</span>
+                                    </div>
+                                    <div class="controls-right">
+                                        <button class="control-btn" id="fullscreen-btn"><i class="fas fa-expand"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -893,14 +1059,109 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function switchServer(serverType) {
-            const player = document.getElementById('main-player');
-            const btns = document.querySelectorAll('.server-btn');
+        // ----------------------------------------------------
+        // کۆنتڕۆلکرنا پلەیەرێ نووی یێ کوردفلیکس
+        // ----------------------------------------------------
+        const video = document.getElementById('main-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const centerPlayBtn = document.getElementById('center-play-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const timeDisplay = document.getElementById('time-display');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const videoContainer = document.getElementById('video-container');
+
+        // گۆهۆڕینا دۆخێ لێدانێ (Play/Pause)
+        function togglePlay() {
+            if (video.paused || video.ended) {
+                video.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                centerPlayBtn.classList.add('fade-out');
+            } else {
+                video.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                centerPlayBtn.classList.remove('fade-out');
+            }
+        }
+
+        playPauseBtn.addEventListener('click', togglePlay);
+        centerPlayBtn.addEventListener('click', togglePlay);
+        video.addEventListener('click', togglePlay);
+
+        // ڕێکخستنا کات و شریتا پێشڤەچوونێ
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
             
+            const mStr = m.toString().padStart(2, '0');
+            const sStr = s.toString().padStart(2, '0');
+            
+            if (h > 0) {
+                return `${h}:${mStr}:${sStr}`;
+            }
+            return `${mStr}:${sStr}`;
+        }
+
+        video.addEventListener('timeupdate', () => {
+            if (!video.duration) return;
+            const percentage = (video.currentTime / video.duration) * 100;
+            progressBar.value = percentage;
+            progressFill.style.width = percentage + '%';
+            
+            timeDisplay.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+        });
+
+        // گۆهۆڕینا کاتی ب ڕێکا شریتێ (Seek)
+        progressBar.addEventListener('input', () => {
+            const time = (progressBar.value / 100) * video.duration;
+            video.currentTime = time;
+            progressFill.style.width = progressBar.value + '%';
+        });
+
+        // پڕ بەخشین (Fullscreen)
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) { /* Safari */
+                    videoContainer.webkitRequestFullscreen();
+                } else if (videoContainer.msRequestFullscreen) { /* IE11 */
+                    videoContainer.msRequestFullscreen();
+                }
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            }
+        }
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // دیاربوونا کۆنتڕۆڵان ل سەر مۆبایلێ دەمێ دەست لێدانێ
+        let touchTimeout;
+        videoContainer.addEventListener('touchstart', () => {
+            videoContainer.classList.add('touch-active');
+            clearTimeout(touchTimeout);
+            touchTimeout = setTimeout(() => {
+                videoContainer.classList.remove('touch-active');
+            }, 3000);
+        });
+
+        function switchServer(serverType) {
+            const btns = document.querySelectorAll('.server-btn');
             btns.forEach(btn => btn.classList.remove('active-server'));
             
             if (serverType === 'main') {
-                player.src = "https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4";
+                video.src = "https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4";
+                video.load();
                 event.currentTarget.classList.add('active-server');
             }
         }
