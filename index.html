@@ -910,19 +910,18 @@
                 </div>
 
                 <!-- ----------------------------------------------------
-                     پلەیەرێ کوردفلیکس (Native HTML5 Video Player)
+                     پلەیەرێ کوردفلیکس (Native Player - ب تەمامی ناڤخۆیی)
                 --------------------------------------------------------- -->
                 <div class="player-container-box" id="player-area">
                     <div class="player-title-bar">
-                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس (Kurdflix Player)</span>
+                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس (Kurdflix Native Player)</span>
                     </div>
                     
-                    <!-- پلەیەرێ گشتی یێ ناڤخۆیی یێ تەمامکری بۆ لێدانا مپ٤ -->
+                    <!-- چوارچۆڤێ ڤیدیۆیێ ناڤخۆیی - پشتگیری ل بەستەرێن MP4 یێن مستقیم دکەت -->
                     <div class="video-wrapper">
-                        <!-- تێبینی: ل بەشێ src ل خوارێ، دەمێ تە لینکێ فیلمێ خۆ یێ GitHub Releases وەرگرت، ل ڤێرە دانیە سەر لێدانێ -->
                         <video id="main-player" controls poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp">
-                            <!-- بەستەرێ تاقیکاری یێ مپ٤ یێ خێرا کو ١٠٠٪ کار دکەت -->
-                            <source id="player-source" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                            <!-- بەستەرێ تە یێ مستقیم یێ فەرمی ل سەر سێرڤەرێ GitHub Releases ل ڤێرە هاتیە جێگیرکرن -->
+                            <source id="player-source" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" type="video/mp4">
                             <!-- ترەکا ژێرنویسا بادینی یا AI -->
                             <track id="player-track" label="بادینی (AI)" kind="subtitles" srclang="ku" default>
                             یاریپێکەر پێشگیری ناکەت.
@@ -980,8 +979,7 @@
                 <div class="servers-section" id="servers-area">
                     <div class="servers-title"><i class="fas fa-server"></i> هەلبژارتنا سێرڤەری</div>
                     <div class="servers-list">
-                        <!-- ئەگەر تە ڤیا بەستەرێ فیلمێ خۆ یێ دروست دانی، ل شوونا ڤی بەستەرێ خوارێ دانی -->
-                        <button class="server-btn active-server" onclick="switchServer('main')"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (Kurdflix Player HD)</button>
+                        <button class="server-btn active-server" onclick="switchServer('main')"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (GitHub Stream HD)</button>
                         <button class="server-btn"><i class="fas fa-download"></i> داونلۆدکرن (Download)</button>
                     </div>
                 </div>
@@ -1143,8 +1141,7 @@
             btns.forEach(btn => btn.classList.remove('active-server'));
             
             if (serverType === 'main') {
-                // لێرە بەستەرێ فەرمیێ یێ MP4 یێ تاقیکاری لۆد دبیت
-                player.src = "https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8";
+                player.src = "https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4";
                 event.currentTarget.classList.add('active-server');
             }
         }
