@@ -433,7 +433,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* پلەیەرێ ناڤخۆیی یێ گشتی */
+        /* پلەیەرێ ناڤخۆیی یێ گشتی دگەل ترەکێن VTT یێن ئۆتۆماتیکی */
         .video-wrapper video {
             position: absolute;
             top: 0;
@@ -453,62 +453,6 @@
             text-shadow: 2px 2px 4px #000;
         }
 
-        /* ستایلێن چاڤەڕێبوونا AI */
-        .ai-loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(10, 10, 12, 0.96);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .ai-loader-content {
-            text-align: center;
-            padding: 20px;
-            max-width: 400px;
-        }
-
-        .ai-icon {
-            font-size: 50px;
-            color: var(--primary-yellow);
-            margin-bottom: 20px;
-            text-shadow: 0 0 15px rgba(245, 181, 10, 0.5);
-        }
-
-        .ai-status-text {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-
-        .ai-status-sub {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 6px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background-color: var(--primary-yellow);
-            border-radius: 10px;
-            transition: width 0.1s linear;
-        }
-
         /* بەشێ کۆنتڕۆلێن دەنگ و زیرەکیێ */
         .player-controls-bar {
             display: flex;
@@ -524,47 +468,32 @@
             flex-direction: row-reverse;
         }
 
-        .ai-translate-btn {
-            background-color: var(--primary-yellow);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
+        /* ستایلێ دەستپێکرنا مینیویا زمانێن ژێرنویسێ وەک یوتیوب */
+        .subtitle-selector-container {
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-
-        .ai-translate-btn:hover {
-            background-color: #ffe066;
-            box-shadow: 0 0 15px rgba(245, 181, 10, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .ai-status-indicator {
-            font-size: 13px;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 14px;
             color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             flex-direction: row-reverse;
+            width: 100%;
+            justify-content: space-between;
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #ef4444; 
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .status-dot.active {
-            background-color: #10b981; 
-            box-shadow: 0 0 8px #10b981;
+        .subtitle-selector-container select {
+            background-color: var(--bg-card);
+            color: var(--primary-yellow);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
         }
 
         /* بەشێ ئەکتەران */
@@ -919,37 +848,26 @@
                     
                     <!-- چوارچۆڤێ ڤیدیۆیێ ناڤخۆیی - پشتگیری ل بەستەرێن MP4 یێن مستقیم دکەت -->
                     <div class="video-wrapper">
+                        <!-- بەستەرێ تە یێ مستقیم یێ فەرمی ل سەر سێرڤەرێ GitHub Releases ل ڤێرە هاتیە جێگیرکرن -->
                         <video id="main-player" controls poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp">
-                            <!-- بەستەرێ تە یێ مستقیم یێ فەرمی ل سەر سێرڤەرێ GitHub Releases ل ڤێرە هاتیە جێگیرکرن -->
                             <source id="player-source" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" type="video/mp4">
-                            <!-- ترەکا ژێرنویسا بادینی یا AI -->
-                            <track id="player-track" label="بادینی (AI)" kind="subtitles" srclang="ku" default>
+                            <!-- لودکرنا زمانێن ژێرنویسێ یێن دروستکری ب شێوەیەکێ ناوخۆیی و ئۆتۆماتیکی ژ گیتھەبی -->
+                            <track label="English" kind="subtitles" srclang="en" src="subtitles.vtt">
+                            <track label="Kurdish (Sorani)" kind="subtitles" srclang="ckb" src="subtitles_ckb.vtt">
+                            <track label="Kurdish (Badini)" kind="subtitles" srclang="ku" src="subtitles_ku.vtt">
                             یاریپێکەر پێشگیری ناکەت.
                         </video>
-                        
-                        <!-- شاشا بارکرنا وەرگێڕانا هوشمەند AI -->
-                        <div class="ai-loading-overlay" id="ai-loading">
-                            <div class="ai-loader-content">
-                                <i class="fas fa-robot fa-spin ai-icon"></i>
-                                <div class="ai-status-text" id="ai-status-desc">سیستەمێ AI یێ کوردفلیکس کار دکەت...</div>
-                                <div class="ai-status-sub">سکرین و ژێرنویسێن بادینی دهێنە رێکخستن</div>
-                                <div class="progress-bar-container">
-                                    <div class="progress-bar-fill" id="ai-progress-bar"></div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
-                    <!-- پانێلا کۆنتڕۆلا زیرەکیا دەستکرد AI -->
-                    <div class="player-controls-bar">
-                        <button class="ai-translate-btn" id="ai-toggle-btn" onclick="toggleAITranslation()">
-                            <i class="fas fa-robot"></i> چالاککرنا ژێرنویسا AI (بادینی)
-                        </button>
-                        <div class="ai-status-indicator">
-                            <span>دۆخی ژێرنویسێ: </span>
-                            <strong id="ai-current-status" style="color: #ef4444;">نەچالاکە</strong>
-                            <span class="status-dot" id="ai-status-dot"></span>
-                        </div>
+                    <!-- مینیویا گۆهۆڕینا زمانێ ژێرنویسێ وەک یوتیوب (CC) -->
+                    <div class="subtitle-selector-container">
+                        <span><i class="fas fa-closed-captioning"></i> زمانێ ژێرنویسێ (CC):</span>
+                        <select id="sub-lang-select" onchange="changeSubtitleLanguage(this.value)">
+                            <option value="off">Off (نەچالاکە)</option>
+                            <option value="en">English (ئینگلیزی)</option>
+                            <option value="ckb">Kurdish - سۆرانی (Google Auto-Translate)</option>
+                            <option value="ku">Kurdish - بادینی/کرمانجی (Google Auto-Translate)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -979,7 +897,7 @@
                 <div class="servers-section" id="servers-area">
                     <div class="servers-title"><i class="fas fa-server"></i> هەلبژارتنا سێرڤەری</div>
                     <div class="servers-list">
-                        <button class="server-btn active-server" onclick="switchServer('main')"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (GitHub Stream HD)</button>
+                        <button class="server-btn active-server" onclick="switchServer('main')"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (Kurdflix Player HD)</button>
                         <button class="server-btn"><i class="fas fa-download"></i> داونلۆدکرن (Download)</button>
                     </div>
                 </div>
@@ -1042,95 +960,27 @@
         }
 
         // ----------------------------------------------------
-        // سیستەمێ کارکرنا AI وەرگێڕانێ ب بادینی (ژێرنویس)
+        // گۆهۆڕینا زمانێ ژێرنویسێ د پلەیەرێ فەرمی دا
         // ----------------------------------------------------
-        let aiActive = false;
-
-        // تێکستێ ژێرنویسا بادینی یا تاقیکاری کو دگەل دەستپێکرنا فیلمی داینامیکی لۆد دبیت
-        const vttText = `WEBVTT
-
-1
-00:00:01.000 --> 00:00:05.000
-[دەستپێک] کوردفلیکس - بخێرهاتی بۆ فیلمێ زەلامێ جەنگێ ب زاراڤێ بادینی
-
-2
-00:00:06.000 --> 00:00:11.000
-[AI Translation] پشتی دەست ژ کار کێشانێ، ئەز ژ بۆ جەنگێ بەرهەڤم.
-
-3
-00:00:12.000 --> 00:00:18.000
-دڤێت ل ڤێرێ ڕووبڕووی چەکدارێن ب کرێگرتی ببینەوە.`;
-
-        // لۆدکرنا فایلا VTT ب رێکا Blob د پلەیەرێ ناڤخۆیی دا
-        const blob = new Blob([vttText], { type: 'text/vtt' });
-        const subtitleUrl = URL.createObjectURL(blob);
-        document.getElementById('player-track').src = subtitleUrl;
-
-        function toggleAITranslation() {
-            const aiLoading = document.getElementById('ai-loading');
-            const progressFill = document.getElementById('ai-progress-bar');
-            const aiStatusText = document.getElementById('ai-current-status');
-            const aiStatusDot = document.getElementById('ai-status-dot');
-            const aiToggleBtn = document.getElementById('ai-toggle-btn');
-            const aiDesc = document.getElementById('ai-status-desc');
+        function changeSubtitleLanguage(langValue) {
             const videoPlayer = document.getElementById('main-player');
+            const tracks = videoPlayer.textTracks;
 
-            if (!aiActive) {
-                aiLoading.style.display = 'flex';
-                progressFill.style.width = '0%';
-                
-                let progress = 0;
-                const statusSteps = [
-                    "شیکارکرنا فریکوێنسیێن دەنگی...",
-                    "لۆدکرنا ژێرنویسا بادینی یا AI...",
-                    "هەڤدەمی کرنا ژێرنویسێ ل سەر ڤیدیۆیێ...",
-                    "پرۆسێسا وەرگێڕانێ ب سەرکەفتیانە ئەنجامدرا!"
-                ];
+            // گرتنا هەمی زمانان د دەستپێکێ دا
+            for (let i = 0; i < tracks.length; i++) {
+                tracks[i].mode = 'disabled';
+            }
 
-                const interval = setInterval(() => {
-                    progress += 2;
-                    progressFill.style.width = progress + '%';
+            if (langValue === 'off') {
+                return;
+            }
 
-                    if (progress < 30) {
-                        aiDesc.innerText = statusSteps[0];
-                    } else if (progress < 60) {
-                        aiDesc.innerText = statusSteps[1];
-                    } else if (progress < 90) {
-                        aiDesc.innerText = statusSteps[2];
-                    } else {
-                        aiDesc.innerText = statusSteps[3];
-                    }
-
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        setTimeout(() => {
-                            aiLoading.style.display = 'none';
-                            aiActive = true;
-                            
-                            // چالاککرنا نیشاندانا ژێرنویسێ د ناڤ پلەیەرێ ناڤخۆیی دا
-                            videoPlayer.textTracks[0].mode = 'showing';
-                            
-                            aiStatusText.innerText = "چالاکە (ژێرنویسا بادینی ب AI)";
-                            aiStatusText.style.color = "#10b981";
-                            aiStatusDot.classList.add('active');
-                            aiToggleBtn.innerHTML = `<i class="fas fa-times-circle"></i> ڕاگرتنا ژێرنویسا AI`;
-                            aiToggleBtn.style.backgroundColor = "#ef4444";
-                            aiToggleBtn.style.color = "#fff";
-                        }, 500);
-                    }
-                }, 60); 
-            } else {
-                aiActive = false;
-                
-                // ڤەشارتن و داخستنا ژێرنویسێ
-                videoPlayer.textTracks[0].mode = 'disabled';
-                
-                aiStatusText.innerText = "نەچالاکە";
-                aiStatusText.style.color = "#ef4444";
-                aiStatusDot.classList.remove('active');
-                aiToggleBtn.innerHTML = `<i class="fas fa-robot"></i> چالاککرنا ژێرنویسا AI (بادینی)`;
-                aiToggleBtn.style.backgroundColor = "var(--primary-yellow)";
-                aiToggleBtn.style.color = "#000";
+            // چالاککرنا زمانی گونجاو ل سەر مۆبایل و براوسەری ب شێوازێ فەرمی
+            for (let i = 0; i < tracks.length; i++) {
+                if (tracks[i].language === langValue) {
+                    tracks[i].mode = 'showing';
+                    break;
+                }
             }
         }
 
