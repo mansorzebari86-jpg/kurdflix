@@ -395,7 +395,7 @@
         }
 
         /* -------------------------------------
-           پلەیەرێ فەرمیێ ناڤخۆیی یێ کوردفلیکس (Kurdflix Native Player)
+           پلەیەرێ فەرمیێ کوردفلیکس (Kurdflix Native Player)
         ---------------------------------------- */
         .player-container-box {
             background-color: var(--bg-card);
@@ -433,7 +433,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* پلەیەرێ ناڤخۆیی یێ گشتی دگەل ترەکێن VTT یێن ئۆتۆماتیکی */
+        /* پلەیەرێ ناڤخۆیی یێ گشتی */
         .video-wrapper video {
             position: absolute;
             top: 0;
@@ -442,58 +442,6 @@
             height: 100%;
             border: 0;
             background-color: #000;
-        }
-
-        /* ستایلێ نمایشکرنا ژێرنویسێ ل سەر ڤیدیۆیێ */
-        video::cue {
-            background-color: rgba(10, 10, 12, 0.85);
-            color: var(--primary-yellow);
-            font-size: 18px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        /* بەشێ کۆنتڕۆلێن دەنگ و زیرەکیێ */
-        .player-controls-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding: 12px;
-            background-color: rgba(255, 255, 255, 0.02);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            flex-wrap: wrap;
-            gap: 15px;
-            flex-direction: row-reverse;
-        }
-
-        /* ستایلێ دەستپێکرنا مینیویا زمانێن ژێرنویسێ وەک یوتیوب */
-        .subtitle-selector-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #fff;
-            flex-direction: row-reverse;
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        .subtitle-selector-container select {
-            background-color: var(--bg-card);
-            color: var(--primary-yellow);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            outline: none;
         }
 
         /* بەشێ ئەکتەران */
@@ -850,24 +798,10 @@
                     <div class="video-wrapper">
                         <!-- بەستەرێ تە یێ مستقیم یێ فەرمی ل سەر سێرڤەرێ GitHub Releases ل ڤێرە هاتیە جێگیرکرن -->
                         <video id="main-player" controls poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp">
+                            <!-- بەستەرێ تە یێ دروست و ڕاستەوخۆ ل سەر ڕیلیزا فەرمی یا گیتھەبی -->
                             <source id="player-source" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" type="video/mp4">
-                            <!-- لودکرنا زمانێن ژێرنویسێ یێن دروستکری ب شێوەیەکێ ناوخۆیی و ئۆتۆماتیکی ژ گیتھەبی -->
-                            <track label="English" kind="subtitles" srclang="en" src="subtitles.vtt">
-                            <track label="Kurdish (Sorani)" kind="subtitles" srclang="ckb" src="subtitles_ckb.vtt">
-                            <track label="Kurdish (Badini)" kind="subtitles" srclang="ku" src="subtitles_ku.vtt">
                             یاریپێکەر پێشگیری ناکەت.
                         </video>
-                    </div>
-
-                    <!-- مینیویا گۆهۆڕینا زمانێ ژێرنویسێ وەک یوتیوب (CC) -->
-                    <div class="subtitle-selector-container">
-                        <span><i class="fas fa-closed-captioning"></i> زمانێ ژێرنویسێ (CC):</span>
-                        <select id="sub-lang-select" onchange="changeSubtitleLanguage(this.value)">
-                            <option value="off">Off (نەچالاکە)</option>
-                            <option value="en">English (ئینگلیزی)</option>
-                            <option value="ckb">Kurdish - سۆرانی (Google Auto-Translate)</option>
-                            <option value="ku">Kurdish - بادینی/کرمانجی (Google Auto-Translate)</option>
-                        </select>
                     </div>
                 </div>
 
@@ -957,31 +891,6 @@
             sidebar.classList.remove('active');
             backdrop.classList.remove('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ----------------------------------------------------
-        // گۆهۆڕینا زمانێ ژێرنویسێ د پلەیەرێ فەرمی دا
-        // ----------------------------------------------------
-        function changeSubtitleLanguage(langValue) {
-            const videoPlayer = document.getElementById('main-player');
-            const tracks = videoPlayer.textTracks;
-
-            // گرتنا هەمی زمانان د دەستپێکێ دا
-            for (let i = 0; i < tracks.length; i++) {
-                tracks[i].mode = 'disabled';
-            }
-
-            if (langValue === 'off') {
-                return;
-            }
-
-            // چالاککرنا زمانی گونجاو ل سەر مۆبایل و براوسەری ب شێوازێ فەرمی
-            for (let i = 0; i < tracks.length; i++) {
-                if (tracks[i].language === langValue) {
-                    tracks[i].mode = 'showing';
-                    break;
-                }
-            }
         }
 
         function switchServer(serverType) {
