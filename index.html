@@ -433,7 +433,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* پلەیەرێ ناڤخۆیی یێ فەرمی */
+        /* پلەیەرێ ناڤخۆیی یێ گشتی */
         .video-wrapper video {
             position: absolute;
             top: 0;
@@ -919,7 +919,7 @@
                     
                     <!-- پلەیەرێ گشتی یێ ناڤخۆیی یێ تەمامکری بۆ لێدانا مپ٤ -->
                     <div class="video-wrapper">
-                        <!-- تێبینی: نوکە بەستەرێ تاقیکاری یێ فەرمی یێ خێرا جێگیر هاتیەکرن داکو کاربکەت -->
+                        <!-- تێبینی: ل بەشێ src ل خوارێ، دەمێ تە لینکێ فیلمێ خۆ یێ GitHub Releases وەرگرت، ل ڤێرە دانیە سەر لێدانێ -->
                         <video id="main-player" controls poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp">
                             <!-- بەستەرێ تاقیکاری یێ مپ٤ یێ خێرا کو ١٠٠٪ کار دکەت -->
                             <source id="player-source" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
@@ -1144,10 +1144,10 @@
             
             if (serverType === 'main') {
                 // لێرە بەستەرێ فەرمیێ یێ MP4 یێ تاقیکاری لۆد دبیت
-                player.src = "https://pixeldrain.com/api/file/EZZk1jD8";
+                player.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
                 event.currentTarget.classList.add('active-server');
             }
         }
     </script>
 </body>
-  </html>
+    </html>
