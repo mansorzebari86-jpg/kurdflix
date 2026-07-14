@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurdflix - سینەمایا کوردی</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        :root {
+            --primary-red: #e50914; --primary-yellow: #f5b50a; 
+            --bg-dark: #0a0a0c; --bg-card: #141418;
+            --text-main: #ffffff; --text-muted: #a1a1aa; --border-color: #27272a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        .main-content { flex: 1; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 4%; background-color: rgba(10, 10, 12, 0.95); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color); backdrop-filter: blur(12px); flex-direction: row-reverse; }
+        .logo { font-size: 26px; font-weight: 900; color: var(--primary-red); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .menu-btn { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; }
+        #home-view { display: block; }
+        .welcome-hero { position: relative; height: 40vh; min-height: 250px; background: linear-gradient(to bottom, rgba(10,10,12,0.2) 0%, var(--bg-dark) 100%), url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=1470') center top/cover no-repeat; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .welcome-content { background: rgba(10, 10, 12, 0.7); padding: 20px 30px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); max-width: 500px; }
+        .welcome-badge { display: inline-block; background-color: rgba(229, 9, 20, 0.2); color: var(--primary-red); border: 1px solid var(--primary-red); padding: 3px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; margin-bottom: 10px; }
+        .welcome-title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+        .welcome-desc { font-size: 13px; color: #d4d4d8; }
+        .categories-container { padding: 20px 4%; }
+        .category-section { margin-bottom: 30px; text-align: right; }
+        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-right: 10px; border-right: 4px solid var(--primary-red); }
+        .category-title { font-size: 18px; font-weight: bold; }
+        .movies-slider { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
+        .movies-slider::-webkit-scrollbar { display: none; }
+        .movie-card { min-width: 130px; width: 130px; background-color: var(--bg-card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); transition: all 0.3s; position: relative; cursor: pointer; }
+        .movie-card:hover { transform: scale(1.05); border-color: var(--primary-yellow); }
+        .movie-thumbnail { position: relative; height: 170px; background-size: cover; background-position: center; }
+        .badge-tag { position: absolute; top: 8px; right: 8px; background-color: var(--primary-red); color: white; padding: 2px 6px; font-size: 9px; font-weight: bold; border-radius: 4px; }
+        .movie-details { padding: 8px; text-align: right; }
+        .movie-name { font-size: 12px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #movie-detail-view { display: none; }
+        .detail-hero { position: relative; width: 100%; height: 35vh; min-height: 250px; background-size: cover !important; background-position: center 20% !important; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 20px; }
+        .back-nav { position: absolute; top: 15px; right: 5%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .detail-poster-container { width: 110px; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .detail-poster-img { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .detail-info-container { max-width: 700px; margin: 0 auto; padding: 20px 5%; }
+        .detail-info-box { background-color: var(--bg-card); border-radius: 15px; padding: 20px; margin-top: -15px; text-align: center; border: 1px solid var(--border-color); }
+        .detail-tags { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+        .detail-tag { background-color: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 4px; }
+        .detail-title-main { font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+        .detail-title-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
+        .detail-story { font-size: 13px; color: #c0c5d0; line-height: 1.6; margin-bottom: 15px; text-align: right; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 10px 0; }
+        .detail-stats { display: flex; justify-content: center; gap: 12px; }
+        .detail-stat-box { background-color: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .detail-stat-num { font-size: 14px; font-weight: bold; color: white; }
+        .player-container-box { background-color: var(--bg-card); border-radius: 15px; padding: 15px; margin-top: 25px; border: 1px solid var(--border-color); text-align: right; }
+        .player-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .player-title { color: var(--primary-yellow); font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background-color: #000; }
+        .video-player-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .video-player-container video { width: 100%; height: 100%; object-fit: contain; cursor: pointer; }
+        video::cue { background-color: rgba(10, 10, 12, 0.85) !important; color: var(--primary-yellow) !important; font-size: 16px !important; font-weight: bold !important; text-shadow: 2px 2px 4px #000 !important; }
+        .custom-subtitles-box { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.85); color: var(--primary-yellow); padding: 6px 12px; border-radius: 6px; font-size: 16px; font-weight: bold; text-align: center; max-width: 85%; z-index: 10; pointer-events: none; display: none; text-shadow: 2px 2px 4px #000; border: 1px solid rgba(245, 181, 10, 0.2); transition: bottom 0.3s; }
+        .video-player-container.touch-active .custom-subtitles-box, .video-player-container:hover .custom-subtitles-box { bottom: 70px; }
+        .center-play-btn { position: absolute; width: 55px; height: 55px; background-color: rgba(245, 181, 10, 0.9); color: #000; border: none; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 11; }
+        .center-play-btn.fade-out { opacity: 0; pointer-events: none; transform: scale(1.2); }
+        .custom-video-controls { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%); padding: 10px 15px; display: flex; flex-direction: column; gap: 6px; z-index: 9; opacity: 0; transition: opacity 0.3s; }
+        .video-player-container:hover .custom-video-controls, .video-player-container.touch-active .custom-video-controls { opacity: 1; }
+        .progress-container { position: relative; width: 100%; height: 5px; background-color: rgba(255, 255, 255, 0.2); border-radius: 3px; cursor: pointer; display: flex; align-items: center; }
+        .progress-container input[type="range"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; margin: 0; }
+        .progress-fill { height: 100%; background-color: var(--primary-yellow); border-radius: 3px; width: 0%; position: relative; }
+        .progress-fill::after { content: ''; position: absolute; right: -5px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; background-color: var(--primary-yellow); border-radius: 50%; }
+        .controls-bottom { display: flex; justify-content: space-between; align-items: center; flex-direction: row-reverse; }
+        .controls-left, .controls-right { display: flex; align-items: center; gap: 12px; flex-direction: row-reverse; }
+        .control-btn { background: none; border: none; color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; }
+        .control-btn:hover { color: var(--primary-yellow); }
+        .time-display { font-size: 12px; color: #d4d4d8; font-weight: bold; }
+        .cast-section { margin-top: 20px; text-align: right; }
+        .cast-title { font-size: 15px; font-weight: bold; margin-bottom: 12px; border-right: 4px solid var(--primary-yellow); padding-right: 8px; }
+        .cast-scroll { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .cast-scroll::-webkit-scrollbar { display: none; }
+        .cast-item { display: flex; flex-direction: column; align-items: center; min-width: 70px; text-align: center; }
+        .cast-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); margin-bottom: 4px; }
+        .cast-name { font-size: 10px; color: white; white-space: nowrap; }
+        .servers-section { margin-top: 25px; background-color: var(--bg-card); border-radius: 15px; padding: 15px; border: 1px solid var(--border-color); text-align: right; }
+        .servers-title { color: var(--primary-yellow); font-size: 15px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .servers-list { display: flex; flex-direction: column; gap: 8px; }
+        .server-btn { background-color: rgba(255,255,255,0.03); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px; border-radius: 10px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s; text-align: right; }
+        .server-btn:hover { background-color: rgba(245, 181, 10, 0.1); border-color: var(--primary-yellow); }
+        .active-server { background-color: rgba(245, 181, 10, 0.15); border-color: var(--primary-yellow); color: var(--primary-yellow); font-weight: bold; }
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background-color: var(--bg-card); z-index: 1000; transition: right 0.4s; padding: 30px 20px; }
+        .sidebar.active { right: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .sidebar-title { font-weight: 900; color: var(--primary-red); font-size: 22px; }
+        .close-btn { background: rgba(255,255,255,0.05); border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 8px; }
+        .sidebar-menu a { color: var(--text-muted); text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; }
+        .sidebar-menu a:hover { background-color: rgba(229, 9, 20, 0.1); color: var(--text-main); }
+        .backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(3px); z-index: 999; }
+        .backdrop.active { display: block; }
+        .footer-credit { text-align: center; padding: 15px; color: var(--text-muted); font-size: 12px; margin-top: 20px; border-top: 1px solid var(--border-color); background-color: var(--bg-dark); }
+        .footer-credit span { color: var(--primary-red); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="backdrop" id="backdrop"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">KURDFLIX</span>
+            <button class="close-btn" id="close-sidebar-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="showHomeView(); return false;"><i class="fas fa-home"></i> لاپەرێ سەرەکی</a></li>
+            <li><a href="#"><i class="fas fa-film"></i> فیلمێن دۆبلاژکری</a></li>
+            <li><a href="#"><i class="fas fa-closed-captioning"></i> فیلمێن ژێرنویس</a></li>
+        </ul>
+    </div>
+
+    <header>
+        <a href="#" onclick="showHomeView(); return false;" class="logo" id="header-logo">
+            Kurdflix <i class="fas fa-play" style="font-size: 20px;"></i>
+        </a>
+        <button class="menu-btn" id="open-sidebar-btn"><i class="fas fa-ellipsis-v"></i></button>
+    </header>
+
+    <div class="main-content">
+        <!-- لاپەرێ سەرەکی -->
+        <div id="home-view">
+            <div class="welcome-hero">
+                <div class="welcome-content">
+                    <span class="welcome-badge">پێشەنگێ فیلمێن کوردی</span>
+                    <h1 class="welcome-title">بخێرهاتی بۆ <span style="color: var(--primary-red);">Kurdflix</span></h1>
+                    <p class="welcome-desc">خۆشترین فیلمێن دۆبلاژ و ژێرنویس ل ڤێرە ب زارۆڤێ بادینی و سۆرانی بەردەستن.</p>
+                </div>
+            </div>
+
+            <div class="categories-container">
+                <div class="category-section">
+                    <div class="category-header">
+                        <span class="category-title"><i class="fas fa-bolt" style="color: #fbbf24;"></i> فیلمێن ئەکشن (Action)</span>
+                    </div>
+                    <div class="movies-slider">
+                        <div class="movie-card" onclick="showMovieDetail('man-of-war')">
+                            <span class="badge-tag">HD</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/xqykFmrN/man-of-war60.webp');"></div>
+                            <div class="movie-details"><div class="movie-name">Man of War</div></div>
+                        </div>
+
+                        <div class="movie-card" onclick="showMovieDetail('the-furious')">
+                            <span class="badge-tag">2025</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/kV8jWdwV/images-1.jpg');"></div>
+                            <div class="movie-details"><div class="movie-name">The Furious</div></div>
+                        </div>
+
+                        <div class="movie-card">
+                            <span class="badge-tag">FHD</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=300');"></div>
+                            <div class="movie-details"><div class="movie-name">جەنگاوەرێ دوماهییێ</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <div class="category-header">
+                        <span class="category-title"><i class="fas fa-ghost" style="color: #a78bfa;"></i> فیلمێن ترسناک (Horror)</span>
+                    </div>
+                    <div class="movies-slider">
+                        <div class="movie-card" onclick="showMovieDetail('the-passenger')">
+                            <span class="badge-tag">2026</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/xqBNWxKJ/images-2.jpg');"></div>
+                            <div class="movie-details"><div class="movie-name">The Passenger</div></div>
+                        </div>
+
+                        <div class="movie-card">
+                            <span class="badge-tag">HD</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300');"></div>
+                            <div class="movie-details"><div class="movie-name">شەڤا د کانیێ دا</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- لاپەرێ زانیاریێن فیلمی -->
+        <div id="movie-detail-view">
+            <div class="detail-hero" id="detail-hero-bg">
+                <button class="back-nav" onclick="showHomeView()"><i class="fas fa-arrow-right"></i> زڤڕین</button>
+                <div class="detail-poster-container">
+                    <img id="detail-poster-img" class="detail-poster-img" src="" alt="Poster">
+                </div>
+                <div class="detail-buttons">
+                    <a href="#player-area" class="btn btn-play"><i class="fas fa-play"></i> تەماشاکرن</a>
+                </div>
+            </div>
+
+            <div class="detail-info-container">
+                <div class="detail-info-box">
+                    <div class="detail-tags" id="detail-tags-container"></div>
+                    <h1 class="detail-title-main" id="detail-title-main"></h1>
+                    <div class="detail-title-sub" id="detail-title-sub"></div>
+                    <div class="detail-story" id="detail-story"></div>
+                    <div class="detail-stats">
+                        <div class="detail-stat-box"><span class="detail-stat-num" id="detail-views"></span><span style="font-size: 10px; color: var(--text-muted);">بینین</span></div>
+                        <div class="detail-stat-box"><span class="detail-stat-num" id="detail-imdb" style="color: var(--primary-yellow);"></span><span style="font-size: 10px; color: var(--text-muted);">IMDb</span></div>
+                    </div>
+                </div>
+
+                <div class="player-container-box" id="player-area">
+                    <div class="player-title-bar">
+                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس</span>
+                    </div>
+                    
+                    <div class="video-wrapper">
+                        <div class="video-player-container" id="video-container">
+                            <video id="main-player" poster="" playsinline>یاریپێکەر پێشگیری ناکەت.</video>
+                            <button class="center-play-btn" id="center-play-btn"><i class="fas fa-play"></i></button>
+                            <div id="custom-subtitles" class="custom-subtitles-box"></div>
+                            
+                            <div class="custom-video-controls" id="video-controls">
+                                <div class="progress-container">
+                                    <input type="range" id="progress-bar" min="0" max="100" value="0" step="0.1">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <div class="controls-bottom">
+                                    <div class="controls-left">
+                                        <button class="control-btn" id="rewind-btn"><i class="fas fa-undo"></i></button>
+                                        <button class="control-btn" id="play-pause-btn"><i class="fas fa-play"></i></button>
+                                        <button class="control-btn" id="forward-btn"><i class="fas fa-redo"></i></button>
+                                        <span class="time-display" id="time-display">00:00 / 00:00</span>
+                                    </div>
+                                    <div class="controls-right">
+                                        <button class="control-btn" id="rotate-btn"><i class="fas fa-sync-alt"></i></button>
+                                        <button class="control-btn" id="fullscreen-btn"><i class="fas fa-expand"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cast-section">
+                    <div class="cast-title">ئەکتەر و دەرهێنەر</div>
+                    <div class="cast-scroll" id="detail-cast-container"></div>
+                </div>
+
+                <div class="servers-section" id="servers-area">
+                    <div class="servers-title"><i class="fas fa-server"></i> هەلبژارتنا سێرڤەری</div>
+                    <div class="servers-list">
+                        <button class="server-btn active-server" onclick="switchServer()"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (Kurdflix Player HD)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-credit">Developed by <span>Mansour</span></div>
+
+    <script>
+        const openBtn = document.getElementById('open-sidebar-btn');
+        const closeBtn = document.getElementById('close-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const homeView = document.getElementById('home-view');
+        const movieDetailView = document.getElementById('movie-detail-view');
+        const headerLogo = document.getElementById('header-logo');
+
+        openBtn.addEventListener('click', () => { sidebar.classList.add('active'); backdrop.classList.add('active'); });
+        closeBtn.addEventListener('click', () => { sidebar.classList.remove('active'); backdrop.classList.remove('active'); });
+        backdrop.addEventListener('click', () => { sidebar.classList.remove('active'); backdrop.classList.remove('active'); });
+
+        const moviesData = {
+            'man-of-war': {
+                title: "Man of War", subTitle: "زەلامێ جەنگێ (٢٠٢١)",
+                story: "پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی.",
+                poster: "https://i.ibb.co/xqykFmrN/man-of-war60.webp", heroBg: "https://i.ibb.co/xqykFmrN/man-of-war60.webp",
+                videoUrl: "https://box-1643-d1.vmeas.cloud/hls2/03/02613/tzwc4lipm1ye_n/master.m3u8?t=5wR9Geg1v4SnxhWCA271PTSTZZVKNE8KecF15vo1nVk=&s=1784033270&e=43200&v=&i=0.4&sp=0&asn=21277",
+                duration: "١ کاتژمێر و ٥١ خولەک", year: "٢٠٢١", genre: "ئەکشن", views: "٣٥,١٧٧", imdb: "⭐ ٦.٣",
+                cast: [{name: "William K.", role: "دەرهێنەر", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150"}, {name: "LaMonica G.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150"}],
+                subtitles: []
+            },
+            'the-furious': {
+                title: "The Furious", subTitle: "توندوتیژ (٢٠٢٥)",
+                story: "فیلمەکێ پڕ جۆش و خروش و ئەکشن یێ بهێز یێ ساڵا ٢٠٢٥، چیرۆکا جەنگاوەرەکێ دکەت کو هەمبەری مافیایێن ترسناک ل سەرانسەری جیهانێ ڕووبەڕوو دبیت.",
+                poster: "https://i.ibb.co/kV8jWdwV/images-1.jpg", heroBg: "https://i.ibb.co/kV8jWdwV/images-1.jpg",
+                videoUrl: "https://prx-1353-ant-23.vmwesa.online/hls2/01/02614/lfoyudb1rfg7_,n,l,.urlset/master.m3u8?t=ifaoFkw0AYYnwfivMUebfTk100RdzCPGSD4jqJKfVl4=&s=1784033270&e=43200&v=&srv=bck-1562-ant-s&i=0.4&sp=0&asn=21277",
+                duration: "١ کاتژمێر و ٤٨ خولەک", year: "٢٠٢٥", genre: "ئەکشن", views: "١٢,٤٥٠", imdb: "⭐ ٧.٥",
+                cast: [{name: "Justin Lin", role: "دەرهێنەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150"}, {name: "Vin Diesel", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150"}],
+                subtitles: []
+            },
+            'the-passenger': {
+                title: "The Passenger", subTitle: "گەشتیار (٢٠٢٦)",
+                story: "فیلمەکێ ترسناک و پڕ جۆش و خروش یێ ساڵا ٢٠٢٦، ل دۆر چیرۆکا گەشتیارەکێ کو د ناڤ گەشتەکا تژی مەترسی و ترسناک دا دەرباز دبیت داکو ل سەر ژیانێ بمینیت.",
+                poster: "https://i.ibb.co/xqBNWxKJ/images-2.jpg", heroBg: "https://i.ibb.co/xqBNWxKJ/images-2.jpg",
+                videoUrl: "https://cdn2.kurdapi.site/sss/EnglishMovies1/2026/ThePassenger-NoSub.mp4/index.m3u8",
+                duration: "١ کاتژمێر و ٢٤ خولەک", year: "٢٠٢٦", genre: "ترسناک", views: "١٨,٩٠٢", imdb: "⭐ ٦.٨",
+                cast: [{name: "Kyle Gallner", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150"}, {name: "Johnny Berchtold", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150"}],
+                subtitles: [{ label: "Kurdish", srclang: "ku", src: "the_passenger.vtt" }] [2]
+            }
+        };
+
+        let currentActiveMovieId = 'man-of-war';
+        let hlsInstance = null;
+        let activeSubtitles = [];
+
+        function showMovieDetail(movieId) {
+            const movie = moviesData[movieId];
+            if (!movie) return;
+            currentActiveMovieId = movieId;
+
+            document.getElementById('detail-hero-bg').style.background = `linear-gradient(to top, var(--bg-dark) 0%, rgba(10,10,12,0.4) 100%), url('${movie.heroBg}')`;
+            document.getElementById('detail-poster-img').src = movie.poster;
+
+            const tagsContainer = document.getElementById('detail-tags-container');
+            tagsContainer.innerHTML = `
+                <span class="detail-tag">${movie.duration}</span>
+                <span class="detail-tag">${movie.year}</span>
+                <span class="detail-tag">${movie.genre}</span>
+                <span class="detail-tag" style="background-color: rgba(245, 181, 10, 0.2); color: var(--primary-yellow);">Kurdish</span>
+            `;
+
+            document.getElementById('detail-title-main').innerText = movie.title;
+            document.getElementById('detail-title-sub').innerText = movie.subTitle;
+            document.getElementById('detail-story').innerText = movie.story;
+            document.getElementById('detail-views').innerText = movie.views;
+            document.getElementById('detail-imdb').innerText = movie.imdb;
+
+            const castContainer = document.getElementById('detail-cast-container');
+            castContainer.innerHTML = '';
+            movie.cast.forEach(person => {
+                castContainer.innerHTML += `
+                    <div class="cast-item">
+                        <img src="${person.img}" class="cast-img">
+                        <span class="cast-name">${person.name}</span>
+                        <span class="cast-role">${person.role}</span>
+                    </div>
+                `;
+            });
+
+            loadVideoSource(movie.videoUrl, movie.poster, movie.subtitles);
+
+            homeView.style.display = 'none';
+            movieDetailView.style.display = 'block';
+            headerLogo.style.color = 'var(--primary-yellow)';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showHomeView() {
+            video.pause();
+            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+            movieDetailView.style.display = 'none';
+            homeView.style.display = 'block';
+            headerLogo.style.color = 'var(--primary-red)';
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const video = document.getElementById('main-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const centerPlayBtn = document.getElementById('center-play-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const timeDisplay = document.getElementById('time-display');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const videoContainer = document.getElementById('video-container');
+        const rewindBtn = document.getElementById('rewind-btn');
+        const forwardBtn = document.getElementById('forward-btn');
+        const rotateBtn = document.getElementById('rotate-btn');
+        const subtitleBox = document.getElementById('custom-subtitles');
+
+        async function fetchAndParseVTT(vttUrl) {
+            activeSubtitles = [];
+            try {
+                const response = await fetch(vttUrl);
+                if (!response.ok) return;
+                const text = await response.text();
+                const lines = text.split(/\r?\n/);
+                let currentCue = null;
+                const timeRegex = /(\d{2}:\d{2}:\d{2}[\.,]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[\.,]\d{3})/;
+
+                for (let line of lines) {
+                    line = line.trim();
+                    if (timeRegex.test(line)) {
+                        const match = line.match(timeRegex);
+                        currentCue = { start: parseTimeToSeconds(match[1]), end: parseTimeToSeconds(match[2]), text: "" };
+                    } else if (currentCue && line !== "" && isNaN(line)) {
+                        currentCue.text += (currentCue.text ? "<br>" : "") + line;
+                    } else if (line === "" && currentCue) {
+                        activeSubtitles.push(currentCue);
+                        currentCue = null;
+                    }
+                }
+                if (currentCue) activeSubtitles.push(currentCue);
+            } catch (error) { console.error("VTT parse failed:", error); }
+        }
+
+        function parseTimeToSeconds(timeStr) {
+            const parts = timeStr.replace(',', '.').split(':');
+            const secs = parts[2].split('.');
+            return parseInt(parts[0],10)*3600 + parseInt(parts[1],10)*60 + parseInt(secs[0],10) + parseInt(secs[1],10)/1000;
+        }
+
+        video.addEventListener('timeupdate', () => {
+            if (!video.duration) return;
+            const percentage = (video.currentTime / video.duration) * 100;
+            progressBar.value = percentage;
+            progressFill.style.width = percentage + '%';
+            timeDisplay.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+
+            if (activeSubtitles.length > 0) {
+                const activeCue = activeSubtitles.find(cue => video.currentTime >= cue.start && video.currentTime <= cue.end);
+                if (activeCue) {
+                    subtitleBox.innerHTML = activeCue.text;
+                    subtitleBox.style.display = 'block';
+                } else { subtitleBox.style.display = 'none'; }
+            } else { subtitleBox.style.display = 'none'; }
+        });
+
+        function loadVideoSource(videoSrc, posterUrl, subtitles) {
+            video.pause();
+            video.poster = posterUrl;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            centerPlayBtn.classList.remove('fade-out');
+            subtitleBox.style.display = 'none';
+            activeSubtitles = [];
+
+            if (subtitles && subtitles.length > 0) {
+                fetchAndParseVTT(subtitles[0].src);
+            }
+
+            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+
+            if (videoSrc.includes('.m3u8') || videoSrc.includes('urlset')) {
+                if (Hls.isSupported()) {
+                    hlsInstance = new Hls();
+                    hlsInstance.loadSource(videoSrc);
+                    hlsInstance.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = videoSrc;
+                }
+            } else { video.src = videoSrc; }
+            video.load();
+        }
+
+        function togglePlay() {
+            if (video.paused || video.ended) {
+                video.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                centerPlayBtn.classList.add('fade-out');
+            } else {
+                video.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                centerPlayBtn.classList.remove('fade-out');
+            }
+        }
+
+        playPauseBtn.addEventListener('click', togglePlay);
+        centerPlayBtn.addEventListener('click', togglePlay);
+        video.addEventListener('click', togglePlay);
+
+        rewindBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime = Math.max(0, video.currentTime - 10); });
+        forwardBtn.addEventListener('click', (e) => { e.stopPropagation(); video.currentTime = Math.min(video.duration, video.currentTime + 10); });
+
+        async function makeLandscape(e) {
+            e.stopPropagation();
+            try {
+                if (!document.fullscreenElement) {
+                    if (videoContainer.requestFullscreen) { await videoContainer.requestFullscreen(); }
+                    else if (videoContainer.webkitRequestFullscreen) { await videoContainer.webkitRequestFullscreen(); }
+                }
+                if (screen.orientation && screen.orientation.lock) { await screen.orientation.lock('landscape'); }
+            } catch (error) { console.log("Landscape lock failed:", error); }
+        }
+
+        rotateBtn.addEventListener('click', makeLandscape);
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60), s = Math.floor(seconds % 60);
+            return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}` : `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        progressBar.addEventListener('input', () => { video.currentTime = (progressBar.value / 100) * video.duration; });
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (videoContainer.requestFullscreen) { videoContainer.requestFullscreen(); }
+                else if (videoContainer.webkitRequestFullscreen) { videoContainer.webkitRequestFullscreen(); }
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                if (document.exitFullscreen) { document.exitFullscreen(); }
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            }
+        }
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            } else { fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>'; }
+        });
+
+        let touchTimeout;
+        videoContainer.addEventListener('touchstart', () => {
+            videoContainer.classList.add('touch-active');
+            clearTimeout(touchTimeout);
+            touchTimeout = setTimeout(() => { videoContainer.classList.remove('touch-active'); }, 3000);
+        });
+
+        function switchServer() {
+            const movie = moviesData[currentActiveMovieId];
+            if (movie) loadVideoSource(movie.videoUrl, movie.poster, movie.subtitles);
+        }
+    </script>
+</body>
+  </html>
