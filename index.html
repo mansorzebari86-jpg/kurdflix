@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kurdflix - سینەمایا کوردی</title>
-    <!-- لودکرنا فونت و ئایکۆنان -->
+    <!-- لودکرna فونت و ئایکۆنان -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* -------------------------------------
@@ -453,6 +453,15 @@
             height: 100%;
             object-fit: contain;
             cursor: pointer;
+        }
+
+        /* ستایلێ نمایشکرنا ژێرنویسا VTT ل سەر ڤیدیۆیێ */
+        video::cue {
+            background-color: rgba(10, 10, 12, 0.85) !important;
+            color: var(--primary-yellow) !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            text-shadow: 2px 2px 4px #000 !important;
         }
 
         /* دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) */
@@ -941,8 +950,10 @@
                     <!-- کانتینەرێ نوو و شیک یێ پلەیەرێ تایبەت ب ڕەنگێ زەر -->
                     <div class="video-wrapper">
                         <div class="video-player-container" id="video-container">
-                            <!-- لێرە پەیڤا crossorigin هاتیە لادان داکو ڤیدیۆ ب تەواوی ب بێ کێشە ل سەر مۆبایل و سایتێ گیتھەبی کار کەت -->
-                            <video id="main-player" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp" playsinline>
+                            <video id="main-player" poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp" playsinline>
+                                <source id="player-source" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" type="video/mp4">
+                                <!-- تەرکا فەرمی یا ژێرنویسا تە ل سەر گیتھەبی ل ڤێرە جێگیر بوو -->
+                                <track label="Kurdish" kind="subtitles" srclang="ku" src="subtitles.vtt" default>
                                 یاریپێکەر پێشگیری ناکەت.
                             </video>
                             
