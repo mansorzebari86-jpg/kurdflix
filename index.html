@@ -459,13 +459,32 @@
             cursor: pointer;
         }
 
-        /* ستایلێ نمایشکرنا ژێرنویسا VTT ل سەر ڤیدیۆیێ */
-        video::cue {
-            background-color: rgba(10, 10, 12, 0.85) !important;
-            color: var(--primary-yellow) !important;
-            font-size: 18px !important;
-            font-weight: bold !important;
-            text-shadow: 2px 2px 4px #000 !important;
+        /* باکسێ ژێرنویسا داینامیک یا فەرمی (Custom HTML Subtitles Overlay) */
+        .custom-subtitles-box {
+            position: absolute;
+            bottom: 60px; /* دەکەوێتە سەرەوەی شریتا کۆنتڕۆڵ بارێ */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: var(--primary-yellow);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 85%;
+            z-index: 10;
+            pointer-events: none; /* کلیك ل سەر ڤیدیۆیێ تێپەڕ دەبێت */
+            display: none; /* ل دەستپێکێ بەرزەیە */
+            text-shadow: 2px 2px 4px #000;
+            border: 1px solid rgba(245, 181, 10, 0.2);
+            transition: bottom 0.3s ease;
+        }
+
+        /* کاتێک کۆنتڕۆڵ بار دەرکەوت، ژێرنویس کەمەک دچیتە سەر */
+        .video-player-container.touch-active .custom-subtitles-box,
+        .video-player-container:hover .custom-subtitles-box {
+            bottom: 80px;
         }
 
         /* دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) */
@@ -484,7 +503,7 @@
             justify-content: center;
             transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(245, 181, 10, 0.5);
-            z-index: 10;
+            z-index: 11;
         }
 
         .center-play-btn:hover {
@@ -900,7 +919,7 @@
                         <span class="category-title"><i class="fas fa-ghost" style="color: #a78bfa;"></i> فیلمێن ترسناک (Horror)</span>
                     </div>
                     <div class="movies-slider">
-                        <!-- فیلمێ ئێکێ یێ ترسناک: The Passenger (2026) - نوو هاتیە زێدەکرن -->
+                        <!-- فیلمێ ئێکێ یێ ترسناک: The Passenger (2026) -->
                         <div class="movie-card" onclick="showMovieDetail('the-passenger')">
                             <span class="badge-tag">2026</span>
                             <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/xqBNWxKJ/images-2.jpg');"></div>
@@ -970,12 +989,15 @@
                     <!-- کانتینەرێ نوو و شیک یێ پلەیەرێ تایبەت ب ڕەنگێ زەر -->
                     <div class="video-wrapper">
                         <div class="video-player-container" id="video-container">
-                            <video id="main-player" src="" poster="" playsinline>
+                            <video id="main-player" poster="" playsinline>
                                 یاریپێکەر پێشگیری ناکەت.
                             </video>
                             
                             <!-- دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) -->
                             <button class="center-play-btn" id="center-play-btn"><i class="fas fa-play"></i></button>
+
+                            <!-- باکسێ ژێرنویسا داینامیک یا فەرمی (Custom HTML Subtitles Overlay) -->
+                            <div id="custom-subtitles" class="custom-subtitles-box"></div>
                             
                             <!-- کۆنتڕۆل بارا ل ژێر نیشانێ -->
                             <div class="custom-video-controls" id="video-controls">
@@ -1118,13 +1140,14 @@
                 ],
                 subtitles: [
                     // فایلا ژێرنویسا کوردی تنێ بۆ ڤی فیلمی هاتیە جێگیرکرن
-                    { label: "Kurdish", srclang: "ku", src: "the_passenger.vtt" }
+                    { label: "Kurdish", srclang: "ku", src: "the_passenger.vtt" } [2]
                 ]
             }
         };
 
         let currentActiveMovieId = 'man-of-war';
         let hlsInstance = null;
+        let activeSubtitles = []; // بەرهەڤکردنا لیستا ژێرنویسێن لۆدکری
 
         // گوهۆڕینی لاپەرەی بۆ لاپەرێ زانیاریێن فیلمی ب شێوازێ داینامیکی
         function showMovieDetail(movieId) {
@@ -1206,6 +1229,68 @@
         const rewindBtn = document.getElementById('rewind-btn');
         const forwardBtn = document.getElementById('forward-btn');
         const rotateBtn = document.getElementById('rotate-btn');
+        const subtitleBox = document.getElementById('custom-subtitles');
+
+        // سیستەمێ زیرەک یێ فەرمی یێ وەرگرتن و لێدانا داینامیک یا ژێرنویسێن VTT
+        async function fetchAndParseVTT(vttUrl) {
+            activeSubtitles = [];
+            try {
+                const response = await fetch(vttUrl);
+                if (!response.ok) return;
+                const text = await response.text();
+                
+                const lines = text.split(/\r?\n/);
+                let currentCue = null;
+                const timeRegex = /(\d{2}:\d{2}:\d{2}[\.,]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[\.,]\d{3})/;
+
+                for (let line of lines) {
+                    line = line.trim();
+                    if (timeRegex.test(line)) {
+                        const match = line.match(timeRegex);
+                        const start = parseTimeToSeconds(match[1]);
+                        const end = parseTimeToSeconds(match[2]);
+                        currentCue = { start, end, text: "" };
+                    } else if (currentCue && line !== "" && isNaN(line)) {
+                        if (currentCue.text) currentCue.text += "<br>" + line;
+                        else currentCue.text = line;
+                    } else if (line === "" && currentCue) {
+                        activeSubtitles.push(currentCue);
+                        currentCue = null;
+                    }
+                }
+                if (currentCue) activeSubtitles.push(currentCue);
+            } catch (error) {
+                console.error("Failed to fetch/parse VTT:", error);
+            }
+        }
+
+        function parseTimeToSeconds(timeStr) {
+            const parts = timeStr.replace(',', '.').split(':');
+            const secondsParts = parts[2].split('.');
+            const hrs = parseInt(parts[0], 10);
+            const mins = parseInt(parts[1], 10);
+            const secs = parseInt(secondsParts[0], 10);
+            const ms = parseInt(secondsParts[1], 10) / 1000;
+            return (hrs * 3600) + (mins * 60) + secs + ms;
+        }
+
+        // مۆنیتۆرکرنا دەمی داکو ژێرنویسا ل سەر شاشێ ب تەمامی کاربکەت
+        video.addEventListener('timeupdate', () => {
+            if (!video.duration || activeSubtitles.length === 0) {
+                subtitleBox.style.display = 'none';
+                return;
+            }
+
+            const currentTime = video.currentTime;
+            const activeCue = activeSubtitles.find(cue => currentTime >= cue.start && currentTime <= cue.end);
+
+            if (activeCue) {
+                subtitleBox.innerHTML = activeCue.text;
+                subtitleBox.style.display = 'block';
+            } else {
+                subtitleBox.style.display = 'none';
+            }
+        });
 
         // فەنکشنا فەرمی یا لۆدکرنا ڤیدیۆیێ (پالپشتیا MP4 و m3u8 دکەت دگەل لۆدکرنا داینامیک یا ژێرنویسان)
         function loadVideoSource(videoSrc, posterUrl, subtitles) {
@@ -1213,22 +1298,12 @@
             video.poster = posterUrl;
             playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
             centerPlayBtn.classList.remove('fade-out');
+            subtitleBox.style.display = 'none';
+            activeSubtitles = []; // بەتاڵکردنا لیستا ژێرنویسێن کۆن
 
-            // لابرینا هەر ترەکەکا ژێرنویسا کۆن د ڤیدیۆیێ دا د دەستپێکێ دا
-            const existingTracks = video.querySelectorAll('track');
-            existingTracks.forEach(track => track.remove());
-
-            // زێدەکرنا تەرکا ژێرنویسا نوو ئەگەر فیلم یێ ژێرنویس بیت (وەک فیلمێ The Passenger)
+            // لۆدکرنا فایلا ژێرنویسێ ئەگەر فیلم یێ ژێرنویس دار بیت (وەک فیلمێ The Passenger) ب ڕێکا Fetch یێ داینامیک
             if (subtitles && subtitles.length > 0) {
-                subtitles.forEach(sub => {
-                    const track = document.createElement('track');
-                    track.label = sub.label;
-                    track.kind = 'subtitles';
-                    track.srclang = sub.srclang;
-                    track.src = sub.src;
-                    track.default = true;
-                    video.appendChild(track);
-                });
+                fetchAndParseVTT(subtitles[0].src);
             }
 
             // ئەگەر HLS بەردەست بی ژ کار دکەین
@@ -1274,125 +1349,4 @@
         // ١٠ چرکە بۆ دواوە (Rewind 10s)
         rewindBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            video.currentTime = Math.max(0, video.currentTime - 10);
-        });
-
-        // ١٠ چرکە بۆ پێشڤە (Forward 10s)
-        forwardBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            video.currentTime = Math.min(video.duration, video.currentTime + 10);
-        });
-
-        // دوگما ئۆتۆماتیک یا لاندسکەیپ (Rotate to Landscape)
-        async function makeLandscape(e) {
-            e.stopPropagation();
-            try {
-                // ل دەستپێکێ دۆخێ فۆڵ شاشە چالاک دکەین
-                if (!document.fullscreenElement) {
-                    if (videoContainer.requestFullscreen) {
-                        await videoContainer.requestFullscreen();
-                    } else if (videoContainer.webkitRequestFullscreen) {
-                        await videoContainer.webkitRequestFullscreen();
-                    }
-                }
-                
-                // پاشان شاشێ دکەینە ئاسۆیی (Landscape)
-                if (screen.orientation && screen.orientation.lock) {
-                    await screen.orientation.lock('landscape');
-                } else if (screen.lockOrientation) {
-                    screen.lockOrientation('landscape');
-                }
-            } catch (error) {
-                console.log("Landscape mode needs user active interaction inside fullscreen first:", error);
-            }
-        }
-
-        rotateBtn.addEventListener('click', makeLandscape);
-
-        // ڕێکخستنا کات و شریتا پێشڤەچوونێ
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return "00:00";
-            const h = Math.floor(seconds / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            const s = Math.floor(seconds % 60);
-            
-            const mStr = m.toString().padStart(2, '0');
-            const sStr = s.toString().padStart(2, '0');
-            
-            if (h > 0) {
-                return `${h}:${mStr}:${sStr}`;
-            }
-            return `${mStr}:${sStr}`;
-        }
-
-        video.addEventListener('timeupdate', () => {
-            if (!video.duration) return;
-            const percentage = (video.currentTime / video.duration) * 100;
-            progressBar.value = percentage;
-            progressFill.style.width = percentage + '%';
-            
-            timeDisplay.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-        });
-
-        // گۆهۆڕینا کاتی ب ڕێکا شریتێ (Seek)
-        progressBar.addEventListener('input', () => {
-            const time = (progressBar.value / 100) * video.duration;
-            video.currentTime = time;
-            progressFill.style.width = progressBar.value + '%';
-        });
-
-        // پڕ بەخشین (Fullscreen)
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                if (videoContainer.requestFullscreen) {
-                    videoContainer.requestFullscreen();
-                } else if (videoContainer.webkitRequestFullscreen) { /* Safari */
-                    videoContainer.webkitRequestFullscreen();
-                } else if (videoContainer.msRequestFullscreen) { /* IE11 */
-                    videoContainer.msRequestFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
-            }
-        }
-
-        fullscreenBtn.addEventListener('click', toggleFullscreen);
-
-        // زڤڕاندنا شاشێ بۆ دۆخێ ستۆنی دەمێ ژ فۆڵ شاشێ دەردکەڤیت
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                if (screen.orientation && screen.orientation.unlock) {
-                    screen.orientation.unlock();
-                }
-                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
-            } else {
-                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
-            }
-        });
-
-        // دیاربوونا کۆنتڕۆڵان ل سەر مۆبایلێ دەمێ دەست لێدانێ
-        let touchTimeout;
-        videoContainer.addEventListener('touchstart', () => {
-            videoContainer.classList.add('touch-active');
-            clearTimeout(touchTimeout);
-            touchTimeout = setTimeout(() => {
-                videoContainer.classList.remove('touch-active');
-            }, 3000);
-        });
-
-        function switchServer() {
-            const movie = moviesData[currentActiveMovieId];
-            if (!movie) return;
-            loadVideoSource(movie.videoUrl, movie.poster, movie.subtitles);
-        }
-    </script>
-</body>
-    </html>
+          
