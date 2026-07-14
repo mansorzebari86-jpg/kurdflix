@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kurdflix - سینەمایا کوردی</title>
-    <!-- لودکرna فونت و ئایکۆنان -->
+    <!-- لودکرنا فونت و ئایکۆنان دگەل کتێبخانەیا فەرمی یا HLS بۆ لێدانا بەستەرێن m3u8 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         /* -------------------------------------
            شێواز و ستایلێن گشتی یێن سایت
@@ -238,8 +239,9 @@
             width: 100%;
             height: 40vh;
             min-height: 300px;
-            background: linear-gradient(to top, var(--bg-dark) 0%, rgba(10,10,12,0.4) 100%), 
-                        url('https://i.ibb.co/xqykFmrN/man-of-war60.webp') center 20%/cover no-repeat;
+            background-size: cover !important;
+            background-position: center 20% !important;
+            background-repeat: no-repeat !important;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -281,6 +283,8 @@
 
         .detail-poster-img {
             width: 100%;
+            height: 170px;
+            object-fit: cover;
             display: block;
         }
 
@@ -453,15 +457,6 @@
             height: 100%;
             object-fit: contain;
             cursor: pointer;
-        }
-
-        /* ستایلێ نمایشکرنا ژێرنویسا VTT ل سەر ڤیدیۆیێ */
-        video::cue {
-            background-color: rgba(10, 10, 12, 0.85) !important;
-            color: var(--primary-yellow) !important;
-            font-size: 18px !important;
-            font-weight: bold !important;
-            text-shadow: 2px 2px 4px #000 !important;
         }
 
         /* دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) */
@@ -861,6 +856,7 @@
                         <span class="category-title"><i class="fas fa-bolt" style="color: #fbbf24;"></i> فیلمێن ئەکشن (Action)</span>
                     </div>
                     <div class="movies-slider">
+                        <!-- فیلمێ ئێکێ: Man of War -->
                         <div class="movie-card" onclick="showMovieDetail('man-of-war')">
                             <span class="badge-tag">HD</span>
                             <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/xqykFmrN/man-of-war60.webp');"></div>
@@ -869,6 +865,16 @@
                             </div>
                         </div>
 
+                        <!-- فیلمێ دووێ: The Furious (2025) - نوو هاتیە زێدەکرن -->
+                        <div class="movie-card" onclick="showMovieDetail('the-furious')">
+                            <span class="badge-tag">2025</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/kV8jWdwV/images-1.jpg');"></div>
+                            <div class="movie-details">
+                                <div class="movie-name">The Furious</div>
+                            </div>
+                        </div>
+
+                        <!-- فیلمێ سێیێ -->
                         <div class="movie-card">
                             <span class="badge-tag">FHD</span>
                             <div class="movie-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=300&auto=format&fit=crop');"></div>
@@ -901,10 +907,10 @@
              بینینی دووێ: لاپەرێ زانیاریێن فیلمی (زەر - شافیلم)
         ========================================================= -->
         <div id="movie-detail-view">
-            <div class="detail-hero">
+            <div class="detail-hero" id="detail-hero-bg">
                 <button class="back-nav" onclick="showHomeView()"><i class="fas fa-arrow-right"></i> زڤڕین</button>
                 <div class="detail-poster-container">
-                    <img src="https://i.ibb.co/xqykFmrN/man-of-war60.webp" alt="Man of War" class="detail-poster-img">
+                    <img id="detail-poster-img" class="detail-poster-img" src="" alt="Poster">
                 </div>
                 <div class="detail-buttons">
                     <a href="#player-area" class="btn btn-play"><i class="fas fa-play"></i> تەماشاکرن</a>
@@ -913,27 +919,22 @@
 
             <div class="detail-info-container">
                 <div class="detail-info-box">
-                    <div class="detail-tags">
-                        <span class="detail-tag">١ دەمژمێر و ٥١ خۆلەک</span>
-                        <span class="detail-tag">٢٠٢١</span>
-                        <span class="detail-tag">ئەکشن</span>
-                        <span class="detail-tag" style="background-color: rgba(245, 181, 10, 0.2); color: var(--primary-yellow);">Kurdish</span>
+                    <div class="detail-tags" id="detail-tags-container">
+                        <!-- تاگ ل ڤێرە ب شێوەیەکێ داینامیکی دروست دبن -->
                     </div>
 
-                    <h1 class="detail-title-main">Man of War</h1>
-                    <div class="detail-title-sub">زەلامێ جەنگێ</div>
+                    <h1 class="detail-title-main" id="detail-title-main"></h1>
+                    <div class="detail-title-sub" id="detail-title-sub"></div>
 
-                    <div class="detail-story">
-                        پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.
-                    </div>
+                    <div class="detail-story" id="detail-story"></div>
 
                     <div class="detail-stats">
                         <div class="detail-stat-box">
-                            <span class="detail-stat-num">٣٥,١٧٧</span>
+                            <span class="detail-stat-num" id="detail-views"></span>
                             <span style="font-size: 11px; color: var(--text-muted);">بینین</span>
                         </div>
                         <div class="detail-stat-box">
-                            <span class="detail-stat-num" style="color: var(--primary-yellow);">⭐ ٦.٣/١٠</span>
+                            <span class="detail-stat-num" id="detail-imdb" style="color: var(--primary-yellow);"></span>
                             <span style="font-size: 11px; color: var(--text-muted);">IMDb</span>
                         </div>
                     </div>
@@ -944,16 +945,13 @@
                 --------------------------------------------------------- -->
                 <div class="player-container-box" id="player-area">
                     <div class="player-title-bar">
-                        <span class="player-title"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس (Kurdflix Custom Player)</span>
+                        <span class="player-title" id="player-title-text"><i class="fas fa-tv"></i> پلەیەرێ کوردفلیکس</span>
                     </div>
                     
                     <!-- کانتینەرێ نوو و شیک یێ پلەیەرێ تایبەت ب ڕەنگێ زەر -->
                     <div class="video-wrapper">
                         <div class="video-player-container" id="video-container">
-                            <video id="main-player" poster="https://i.ibb.co/xqykFmrN/man-of-war60.webp" playsinline>
-                                <source id="player-source" src="https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4" type="video/mp4">
-                                <!-- تەرکا فەرمی یا ژێرنویسا تە ل سەر گیتھەبی ل ڤێرە جێگیر بوو -->
-                                <track label="Kurdish" kind="subtitles" srclang="ku" src="subtitles.vtt" default>
+                            <video id="main-player" poster="" playsinline>
                                 یاریپێکەر پێشگیری ناکەت.
                             </video>
                             
@@ -990,22 +988,8 @@
                 <!-- ئەکتەران -->
                 <div class="cast-section">
                     <div class="cast-title">ئەکتەر و دەرهێنەر</div>
-                    <div class="cast-scroll">
-                        <div class="cast-item">
-                            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" class="cast-img">
-                            <span class="cast-name">William K.</span>
-                            <span class="cast-role">دەرهێنەر</span>
-                        </div>
-                        <div class="cast-item">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" class="cast-img">
-                            <span class="cast-name">LaMonica G.</span>
-                            <span class="cast-role">ئەکتەر</span>
-                        </div>
-                        <div class="cast-item">
-                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" class="cast-img">
-                            <span class="cast-name">Andrew H.</span>
-                            <span class="cast-role">ئەکتەر</span>
-                        </div>
+                    <div class="cast-scroll" id="detail-cast-container">
+                        <!-- ئەکتەر ل ڤێرە ب داینامیکی دروست دبن -->
                     </div>
                 </div>
 
@@ -1013,7 +997,7 @@
                 <div class="servers-section" id="servers-area">
                     <div class="servers-title"><i class="fas fa-server"></i> هەلبژارتنا سێرڤەری</div>
                     <div class="servers-list">
-                        <button class="server-btn active-server" onclick="switchServer('main')"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (Kurdflix Player HD)</button>
+                        <button class="server-btn active-server" onclick="switchServer()"><i class="fas fa-play-circle"></i> سێرڤەرێ ١ (Kurdflix Player HD)</button>
                         <button class="server-btn"><i class="fas fa-download"></i> داونلۆدکرن (Download)</button>
                     </div>
                 </div>
@@ -1055,18 +1039,109 @@
             backdrop.classList.remove('active');
         });
 
-        // گوهۆڕینی لاپەرەی بۆ لاپەرێ فیلمی (Man of War)
-        function showMovieDetail(movieId) {
-            if (movieId === 'man-of-war') {
-                homeView.style.display = 'none';
-                movieDetailView.style.display = 'block';
-                headerLogo.style.color = 'var(--primary-yellow)';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+        // ----------------------------------------------------
+        // پێزانینێن فەرمیێن هەمی فیلمان د ناڤ ماڵپەری دا (Database)
+        // ----------------------------------------------------
+        const moviesData = {
+            'man-of-war': {
+                title: "Man of War",
+                subTitle: "زەلامێ جەنگێ (٢٠٢١)",
+                story: "پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.",
+                poster: "https://i.ibb.co/xqykFmrN/man-of-war60.webp",
+                heroBg: "https://i.ibb.co/xqykFmrN/man-of-war60.webp",
+                videoUrl: "https://box-1643-d1.vmeas.cloud/hls2/03/02613/tzwc4lipm1ye_n/master.m3u8?t=5wR9Geg1v4SnxhWCA271PTSTZZVKNE8KecF15vo1nVk=&s=1784033270&e=43200&v=&i=0.4&sp=0&asn=21277",
+                duration: "١ دەمژمێر و ٥١ خۆلەک",
+                year: "٢٠٢١",
+                genre: "ئەکشن",
+                views: "٣٥,١٧٧",
+                imdb: "⭐ ٦.٣/١٠",
+                cast: [
+                    { name: "William K.", role: "دەرهێنەر", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" },
+                    { name: "LaMonica G.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" },
+                    { name: "Andrew H.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" }
+                ]
+            },
+            'the-furious': {
+                title: "The Furious",
+                subTitle: "توندوتیژ (٢٠٢٥)",
+                story: "فیلمەکێ پڕ جۆش و خروش و ئەکشن یێ بهێز یێ ساڵا ٢٠٢٥، چیرۆکا جەنگاوەرەکێ دکەت کو هەمبەری مافیایێن ترسناک ل سەرانسەری جیهانێ ڕووبەڕوو دبیت داکو خێزانا خۆ ڕزگار بکەت.",
+                poster: "https://i.ibb.co/kV8jWdwV/images-1.jpg",
+                heroBg: "https://i.ibb.co/kV8jWdwV/images-1.jpg",
+                videoUrl: "https://prx-1353-ant-23.vmwesa.online/hls2/01/02614/lfoyudb1rfg7_,n,l,.urlset/master.m3u8?t=ifaoFkw0AYYnwfivMUebfTk100RdzCPGSD4jqJKfVl4=&s=1784032691&e=43200&v=&srv=bck-1562-ant-s&i=0.4&sp=0&asn=21277",
+                duration: "١ دەمژمێر و ٤٨ خۆلەک",
+                year: "٢٠٢٥",
+                genre: "ئەکشن / توندوتیژ",
+                views: "١٢,٤٥٠",
+                imdb: "⭐ ٧.٥/١٠",
+                cast: [
+                    { name: "Justin Lin", role: "دەرهێنەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" },
+                    { name: "Vin Diesel", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" },
+                    { name: "Michelle R.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=150&auto=format&fit=crop" }
+                ]
             }
+        };
+
+        let currentActiveMovieId = 'man-of-war';
+        let hlsInstance = null;
+
+        // گوهۆڕینی لاپەرەی بۆ لاپەرێ زانیاریێن فیلمی ب شێوازێ داینامیکی
+        function showMovieDetail(movieId) {
+            const movie = moviesData[movieId];
+            if (!movie) return;
+
+            currentActiveMovieId = movieId;
+
+            // ١. گۆڕینی دیزاین و پۆستەران
+            document.getElementById('detail-hero-bg').style.background = `linear-gradient(to top, var(--bg-dark) 0%, rgba(10,10,12,0.4) 100%), url('${movie.heroBg}')`;
+            document.getElementById('detail-poster-img').src = movie.poster;
+
+            // ٢. دروستکرنا تاگێن گشتی
+            const tagsContainer = document.getElementById('detail-tags-container');
+            tagsContainer.innerHTML = `
+                <span class="detail-tag">${movie.duration}</span>
+                <span class="detail-tag">${movie.year}</span>
+                <span class="detail-tag">${movie.genre}</span>
+                <span class="detail-tag" style="background-color: rgba(245, 181, 10, 0.2); color: var(--primary-yellow);">Kurdish</span>
+            `;
+
+            // ٣. ناڤ نیشان و چیرۆک
+            document.getElementById('detail-title-main').innerText = movie.title;
+            document.getElementById('detail-title-sub').innerText = movie.subTitle;
+            document.getElementById('detail-story').innerText = movie.story;
+
+            // ٤. بینین و نمرەیا IMDb
+            document.getElementById('detail-views').innerText = movie.views;
+            document.getElementById('detail-imdb').innerText = movie.imdb;
+
+            // ٥. دروستکرنا مینیویا ئەکتەران ب داینامیکی
+            const castContainer = document.getElementById('detail-cast-container');
+            castContainer.innerHTML = '';
+            movie.cast.forEach(person => {
+                castContainer.innerHTML += `
+                    <div class="cast-item">
+                        <img src="${person.img}" class="cast-img">
+                        <span class="cast-name">${person.name}</span>
+                        <span class="cast-role">${person.role}</span>
+                    </div>
+                `;
+            });
+
+            // ٦. ڕێکخستن و لۆدکرنا بەستەرێ ڤیدیۆیێ د پلەیەری دا
+            loadVideoSource(movie.videoUrl, movie.poster);
+
+            homeView.style.display = 'none';
+            movieDetailView.style.display = 'block';
+            headerLogo.style.color = 'var(--primary-yellow)';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // گوهۆڕینی لاپەرەی بۆ لاپەرێ سەرەکی (سوور)
         function showHomeView() {
+            video.pause();
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
             movieDetailView.style.display = 'none';
             homeView.style.display = 'block';
             headerLogo.style.color = 'var(--primary-red)';
@@ -1076,7 +1151,7 @@
         }
 
         // ----------------------------------------------------
-        // کۆنتڕۆلکرنا پلەیەرێ نووی یێ کوردفلیکس
+        // کۆنتڕۆلکرنا پلەیەرێ نووی یێ کوردفلیکس دگەل HLS (.m3u8)
         // ----------------------------------------------------
         const video = document.getElementById('main-player');
         const playPauseBtn = document.getElementById('play-pause-btn');
@@ -1089,6 +1164,36 @@
         const rewindBtn = document.getElementById('rewind-btn');
         const forwardBtn = document.getElementById('forward-btn');
         const rotateBtn = document.getElementById('rotate-btn');
+
+        // فەنکشنا فەرمی یا لۆدکرنا ڤیدیۆیێ (پالپشتیا MP4 و m3u8 دکەت)
+        function loadVideoSource(videoSrc, posterUrl) {
+            video.pause();
+            video.poster = posterUrl;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            centerPlayBtn.classList.remove('fade-out');
+
+            // ئەگەر HLS بەردەست بی ژ کار دکەین
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
+
+            // ئەگەر بەستەر .m3u8 بیت (وەک فیلمێ نوو)
+            if (videoSrc.includes('.m3u8') || videoSrc.includes('urlset')) {
+                if (Hls.isSupported()) {
+                    hlsInstance = new Hls();
+                    hlsInstance.loadSource(videoSrc);
+                    hlsInstance.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    // بۆ مۆبایلێن ئایفۆن و سافاری
+                    video.src = videoSrc;
+                }
+            } else {
+                // بۆ بەستەرێن MP4 یێن ئاسایی
+                video.src = videoSrc;
+            }
+            video.load();
+        }
 
         // گۆهۆڕینا دۆخێ لێدانێ (Play/Pause)
         function togglePlay() {
@@ -1224,15 +1329,10 @@
             }, 3000);
         });
 
-        function switchServer(serverType) {
-            const btns = document.querySelectorAll('.server-btn');
-            btns.forEach(btn => btn.classList.remove('active-server'));
-            
-            if (serverType === 'main') {
-                video.src = "https://github.com/mansorzebari86-jpg/kurdflix/releases/download/v1.0.0/cbb5b88f175d11c60164886a32540aff.1.mp4";
-                video.load();
-                event.currentTarget.classList.add('active-server');
-            }
+        function switchServer() {
+            const movie = moviesData[currentActiveMovieId];
+            if (!movie) return;
+            loadVideoSource(movie.videoUrl, movie.poster);
         }
     </script>
 </body>
