@@ -459,6 +459,15 @@
             cursor: pointer;
         }
 
+        /* ستایلێ نمایشکرنا ژێرنویسا VTT ل سەر ڤیدیۆیێ */
+        video::cue {
+            background-color: rgba(10, 10, 12, 0.85) !important;
+            color: var(--primary-yellow) !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            text-shadow: 2px 2px 4px #000 !important;
+        }
+
         /* دوگمێ لێدانێ مەزن د ناڤەڕۆکێ دا (Netflix Style) */
         .center-play-btn {
             position: absolute;
@@ -865,7 +874,7 @@
                             </div>
                         </div>
 
-                        <!-- فیلمێ دووێ: The Furious (2025) - نوو هاتیە زێدەکرن -->
+                        <!-- فیلمێ دووێ: The Furious (2025) -->
                         <div class="movie-card" onclick="showMovieDetail('the-furious')">
                             <span class="badge-tag">2025</span>
                             <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/kV8jWdwV/images-1.jpg');"></div>
@@ -891,6 +900,16 @@
                         <span class="category-title"><i class="fas fa-ghost" style="color: #a78bfa;"></i> فیلمێن ترسناک (Horror)</span>
                     </div>
                     <div class="movies-slider">
+                        <!-- فیلمێ ئێکێ یێ ترسناک: The Passenger (2026) - نوو هاتیە زێدەکرن -->
+                        <div class="movie-card" onclick="showMovieDetail('the-passenger')">
+                            <span class="badge-tag">2026</span>
+                            <div class="movie-thumbnail" style="background-image: url('https://i.ibb.co/xqBNWxKJ/images-2.jpg');"></div>
+                            <div class="movie-details">
+                                <div class="movie-name">The Passenger</div>
+                            </div>
+                        </div>
+
+                        <!-- فیلمێن دی یێن ترسناک -->
                         <div class="movie-card">
                             <span class="badge-tag">HD</span>
                             <div class="movie-thumbnail" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=300&auto=format&fit=crop');"></div>
@@ -951,7 +970,7 @@
                     <!-- کانتینەرێ نوو و شیک یێ پلەیەرێ تایبەت ب ڕەنگێ زەر -->
                     <div class="video-wrapper">
                         <div class="video-player-container" id="video-container">
-                            <video id="main-player" poster="" playsinline>
+                            <video id="main-player" src="" poster="" playsinline>
                                 یاریپێکەر پێشگیری ناکەت.
                             </video>
                             
@@ -1046,7 +1065,7 @@
             'man-of-war': {
                 title: "Man of War",
                 subTitle: "زەلامێ جەنگێ (٢٠٢١)",
-                story: "پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی و تارماییێن ڕابردوویێ ببیتەڤە.",
+                story: "پشتی ژ کار دەرخستنێ، کارمەندەکێ هەوارهاتنێ ل سەردەمێ شەڕێ ئۆکرانیادا، کۆماندۆیەک پێشنیارا هێزێن تایبەت بۆ ڕزگارکرنێ دچیتە ناڤ جەرگێ شەڕی. دڤێت ل وێرێ ڕووبڕووی چەکدارێن ب کرێگرتی ببیتەڤە.",
                 poster: "https://i.ibb.co/xqykFmrN/man-of-war60.webp",
                 heroBg: "https://i.ibb.co/xqykFmrN/man-of-war60.webp",
                 videoUrl: "https://box-1643-d1.vmeas.cloud/hls2/03/02613/tzwc4lipm1ye_n/master.m3u8?t=5wR9Geg1v4SnxhWCA271PTSTZZVKNE8KecF15vo1nVk=&s=1784033270&e=43200&v=&i=0.4&sp=0&asn=21277",
@@ -1059,7 +1078,8 @@
                     { name: "William K.", role: "دەرهێنەر", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop" },
                     { name: "LaMonica G.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" },
                     { name: "Andrew H.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" }
-                ]
+                ],
+                subtitles: [] // هیچ ژێرنویسەک د ناڤ ڤی فیلمی دا نینە
             },
             'the-furious': {
                 title: "The Furious",
@@ -1067,7 +1087,7 @@
                 story: "فیلمەکێ پڕ جۆش و خروش و ئەکشن یێ بهێز یێ ساڵا ٢٠٢٥، چیرۆکا جەنگاوەرەکێ دکەت کو هەمبەری مافیایێن ترسناک ل سەرانسەری جیهانێ ڕووبەڕوو دبیت داکو خێزانا خۆ ڕزگار بکەت.",
                 poster: "https://i.ibb.co/kV8jWdwV/images-1.jpg",
                 heroBg: "https://i.ibb.co/kV8jWdwV/images-1.jpg",
-                videoUrl: "https://prx-1353-ant-23.vmwesa.online/hls2/01/02614/lfoyudb1rfg7_,n,l,.urlset/master.m3u8?t=ifaoFkw0AYYnwfivMUebfTk100RdzCPGSD4jqJKfVl4=&s=1784032691&e=43200&v=&srv=bck-1562-ant-s&i=0.4&sp=0&asn=21277",
+                videoUrl: "https://prx-1353-ant-23.vmwesa.online/hls2/01/02614/lfoyudb1rfg7_,n,l,.urlset/master.m3u8?t=ifaoFkw0AYYnwfivMUebfTk100RdzCPGSD4jqJKfVl4=&s=1784033270&e=43200&v=&srv=bck-1562-ant-s&i=0.4&sp=0&asn=21277",
                 duration: "١ دەمژمێر و ٤٨ خۆلەک",
                 year: "٢٠٢٥",
                 genre: "ئەکشن / توندوتیژ",
@@ -1077,6 +1097,28 @@
                     { name: "Justin Lin", role: "دەرهێنەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" },
                     { name: "Vin Diesel", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" },
                     { name: "Michelle R.", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=150&auto=format&fit=crop" }
+                ],
+                subtitles: [] // هیچ ژێرنویسەک د ناڤ ڤی فیلمی دا نینە
+            },
+            'the-passenger': {
+                title: "The Passenger",
+                subTitle: "گەشتیار (٢٠٢٦)",
+                story: "فیلمەکێ ترسناک و پڕ جۆش و خروش یێ ساڵا ٢٠٢٦، ل دۆر چیرۆکا گەشتیارەکێ کو د ناڤ گەشتەکا تژی مەترسی و ترسناک دا دەرباز دبیت و دڤێت بەرەنگاری چەندین کێشەیێن نەچاوەڕوانکری ببیت داکو ل سەر ژیانێ بمینیت.",
+                poster: "https://i.ibb.co/xqBNWxKJ/images-2.jpg",
+                heroBg: "https://i.ibb.co/xqBNWxKJ/images-2.jpg",
+                videoUrl: "https://cdn2.kurdapi.site/sss/EnglishMovies1/2026/ThePassenger-NoSub.mp4/index.m3u8",
+                duration: "١ دەمژمێر و ٢٤ خۆلەک",
+                year: "٢٠٢٦",
+                genre: "ترسناک / مەتەڵ",
+                views: "١٨,٩٠٢",
+                imdb: "⭐ ٦.٨/١٠",
+                cast: [
+                    { name: "Kyle Gallner", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" },
+                    { name: "Johnny Berchtold", role: "ئەکتەر", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" }
+                ],
+                subtitles: [
+                    // فایلا ژێرنویسا کوردی تنێ بۆ ڤی فیلمی هاتیە جێگیرکرن
+                    { label: "Kurdish", srclang: "ku", src: "the_passenger.vtt" }
                 ]
             }
         };
@@ -1126,8 +1168,8 @@
                 `;
             });
 
-            // ٦. ڕێکخستن و لۆدکرنا بەستەرێ ڤیدیۆیێ د پلەیەری دا
-            loadVideoSource(movie.videoUrl, movie.poster);
+            // ٦. ڕێکخستن و لۆدکرنا بەستەرێ ڤیدیۆیێ دگەل ژێرنویسا داینامیک د پلەیەری دا
+            loadVideoSource(movie.videoUrl, movie.poster, movie.subtitles);
 
             homeView.style.display = 'none';
             movieDetailView.style.display = 'block';
@@ -1165,12 +1207,29 @@
         const forwardBtn = document.getElementById('forward-btn');
         const rotateBtn = document.getElementById('rotate-btn');
 
-        // فەنکشنا فەرمی یا لۆدکرنا ڤیدیۆیێ (پالپشتیا MP4 و m3u8 دکەت)
-        function loadVideoSource(videoSrc, posterUrl) {
+        // فەنکشنا فەرمی یا لۆدکرنا ڤیدیۆیێ (پالپشتیا MP4 و m3u8 دکەت دگەل لۆدکرنا داینامیک یا ژێرنویسان)
+        function loadVideoSource(videoSrc, posterUrl, subtitles) {
             video.pause();
             video.poster = posterUrl;
             playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
             centerPlayBtn.classList.remove('fade-out');
+
+            // لابرینا هەر ترەکەکا ژێرنویسا کۆن د ڤیدیۆیێ دا د دەستپێکێ دا
+            const existingTracks = video.querySelectorAll('track');
+            existingTracks.forEach(track => track.remove());
+
+            // زێدەکرنا تەرکا ژێرنویسا نوو ئەگەر فیلم یێ ژێرنویس بیت (وەک فیلمێ The Passenger)
+            if (subtitles && subtitles.length > 0) {
+                subtitles.forEach(sub => {
+                    const track = document.createElement('track');
+                    track.label = sub.label;
+                    track.kind = 'subtitles';
+                    track.srclang = sub.srclang;
+                    track.src = sub.src;
+                    track.default = true;
+                    video.appendChild(track);
+                });
+            }
 
             // ئەگەر HLS بەردەست بی ژ کار دکەین
             if (hlsInstance) {
@@ -1332,7 +1391,7 @@
         function switchServer() {
             const movie = moviesData[currentActiveMovieId];
             if (!movie) return;
-            loadVideoSource(movie.videoUrl, movie.poster);
+            loadVideoSource(movie.videoUrl, movie.poster, movie.subtitles);
         }
     </script>
 </body>
